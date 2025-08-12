@@ -1,6 +1,6 @@
 [package]
 name = "puniyu_system_info"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2024"
 description = "奈柚核心，获取系统信息"
 keywords = ["system", "info"]
