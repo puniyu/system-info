@@ -17,11 +17,12 @@ gfxinfo = { version = "0.1.2", optional = true }
 chrono = { version = "0.4" }
 
 [features]
-default = ["host", "process", "cpu", "memory", "disk"]
+default = ["host", "process", "cpu", "memory","network", "disk"]
 host = []
 process = []
 cpu = []
 memory = []
+network = []
 disk = []
 gpu = ["gfxinfo"]
 

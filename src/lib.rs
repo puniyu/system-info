@@ -3,8 +3,10 @@ use chrono::{offset::FixedOffset, TimeZone, Utc};
 use gfxinfo::active_gpu;
 use rust_decimal::{prelude::{FromPrimitive, ToPrimitive}, Decimal};
 use std::{env, process};
+#[cfg(feature = "network")]
+use std::net::IpAddr;
 use std::thread::sleep;
-use sysinfo::{Disks, Pid, ProcessesToUpdate, System};
+use sysinfo::{Disks, Pid, ProcessesToUpdate, System, Networks, MacAddr};
 
 #[derive(Debug)]
 pub struct SystemInfo {
@@ -17,6 +19,9 @@ pub struct SystemInfo {
     /// 内存信息
     #[cfg(feature = "memory")]
     pub memory: MemoryInfo,
+    /// 网卡信息
+    #[cfg(feature = "network")]
+    pub network: Vec<NetworkInfo>,
     /// 硬盘信息
     #[cfg(feature = "disk")]
     pub disk: DiskInfo,
@@ -41,6 +46,30 @@ pub struct HostInfo {
     pub os_type: String,
     /// 系统启动时间， 上海时区
     pub boot_time: String,
+}
+
+#[derive(Debug)]
+#[cfg(feature = "network")]
+pub struct NetworkInfo {
+    /// 网卡名称
+    pub name: String,
+    /// 网卡ip信息
+    pub ip_info: Vec<IpInfo>,
+    /// 网卡接收字节数(单位: KB/S)
+    pub upload: f64,
+    /// 网卡发送字节数(单位: KB/S)
+    pub download: f64,
+    /// 网卡mac地址
+    pub mac_addr: MacAddr,
+}
+
+#[derive(Debug)]
+#[cfg(feature = "network")]
+pub struct IpInfo {
+    /// ip地址
+    pub ip_address: IpAddr,
+    /// 子网掩码
+    pub netmask: u8,
 }
 
 #[derive(Debug)]
@@ -146,6 +175,8 @@ pub fn get_system_info() -> SystemInfo {
     let cpu = get_cpu_info();
     #[cfg(feature = "memory")]
     let memory = get_memory_info();
+    #[cfg(feature = "network")]
+    let network = get_network_info();
     #[cfg(feature = "disk")]
     let disk = get_disk_info();
     #[cfg(feature = "gpu")]
@@ -160,6 +191,8 @@ pub fn get_system_info() -> SystemInfo {
         cpu,
         #[cfg(feature = "memory")]
         memory,
+        #[cfg(feature = "network")]
+        network,
         #[cfg(feature = "disk")]
         disk,
         #[cfg(feature = "gpu")]
@@ -355,6 +388,112 @@ pub fn get_disk_info() -> DiskInfo {
 }
 
 
+/// 获取网卡信息
+///
+/// 此函数可以获取网络信息，包括网络名称、MAC地址、上传速度、下载速度、IP地址等
+/// # 返回值
+///
+/// * [Vec<NetworkInfo>] - 网络信息
+///
+#[cfg(feature = "network")]
+pub fn get_network_info() -> Vec<NetworkInfo> {
+    let networks = Networks::new_with_refreshed_list();
+    let mut network_infos = Vec::new();
+    for (network, data) in networks.list() {
+        let mut ip_info_list: Vec<IpInfo> = Vec::new();
+
+        for ip_network in data.ip_networks() {
+            ip_info_list.push(IpInfo {
+                ip_address: ip_network.addr,
+                netmask: ip_network.prefix,
+            });
+        }
+        network_infos.push(NetworkInfo {
+            name: network.to_string(),
+            mac_addr: data.mac_address(),
+            upload: format_to_f64( data.total_received() as f32 / 1024.0, 2),
+            download: format_to_f64( data.total_transmitted() as f32 / 1024.0, 2),
+            ip_info: ip_info_list,
+        });
+    }
+    network_infos
+}
+
+/// 获取当前网络信息
+///
+/// 此函数可以获取当前网络信息，包括网络名称、MAC地址、上传速度、下载速度、IP地址等
+/// # 返回值
+///
+/// * [NetworkInfo] - 当前网络信息
+///
+#[cfg(feature = "network")]
+pub fn get_current_network_info() -> NetworkInfo {
+    let mut networks = Networks::new_with_refreshed_list();
+
+    sleep(std::time::Duration::from_millis(100));
+
+    networks.refresh(true);
+
+
+    let process_network_data = |_: &str, data: &sysinfo::NetworkData| -> (Vec<IpInfo>, bool) {
+        let mut ip_info_list: Vec<IpInfo> = Vec::new();
+        let mut has_ipv4 = false;
+
+        for ip_network in data.ip_networks() {
+            ip_info_list.push(IpInfo {
+                ip_address: ip_network.addr,
+                netmask: ip_network.prefix,
+            });
+
+            if ip_network.addr.is_ipv4() {
+                has_ipv4 = true;
+            }
+        }
+
+        (ip_info_list, has_ipv4)
+    };
+    let is_loopback = |name: &str| -> bool {
+        name.starts_with("lo") || name.starts_with("Loopback") || name.contains("loopback")
+    };
+
+    for (network_name, data) in networks.list() {
+        let (ip_info_list, has_ipv4) = process_network_data(network_name, data);
+
+        let recent_traffic = data.received() + data.transmitted();
+        if !is_loopback(network_name) && has_ipv4 && !ip_info_list.is_empty() && recent_traffic > 0 {
+            return NetworkInfo {
+                name: network_name.to_string(),
+                mac_addr: data.mac_address(),
+                upload: format_to_f64(data.received() as f32 / 1024.0, 2),
+                download: format_to_f64(data.transmitted() as f32 / 1024.0, 2),
+                ip_info: ip_info_list,
+            };
+        }
+    }
+
+    for (network_name, data) in networks.list() {
+        let (ip_info_list, has_ipv4) = process_network_data(network_name, data);
+
+        if !is_loopback(network_name) && has_ipv4 && !ip_info_list.is_empty() {
+            return NetworkInfo {
+                name: network_name.to_string(),
+                mac_addr: data.mac_address(),
+                upload: 0.0,
+                download: 0.0,
+                ip_info: ip_info_list,
+            };
+        }
+    }
+
+    NetworkInfo {
+        name: "unknown".to_string(),
+        mac_addr: MacAddr([0, 0, 0, 0, 0, 0]),
+        upload: 0.0,
+        download: 0.0,
+        ip_info: vec![],
+    }
+}
+
 /// 获取进程信息
 /// 此函数可以获取进程信息，包括进程ID、进程名称、CPU使用率、内存使用率、已用内存等
 /// # 返回值
@@ -417,6 +556,15 @@ where
     let decimal_value = Decimal::from_f64(value.into()).unwrap_or(Decimal::ZERO);
     let rounded = decimal_value.round_dp(decimals);
     rounded.to_f32().unwrap_or(0.0)
+}
+
+fn format_to_f64<T>(value: T, decimals: u32) -> f64
+where
+    T: Into<f32>,
+{
+    let decimal_value = Decimal::from_f32(value.into()).unwrap_or(Decimal::ZERO);
+    let rounded = decimal_value.round_dp(decimals);
+    rounded.to_f64().unwrap_or(0.0)
 }
 
 /// 格式化运行时间，类似于JavaScript中的uptime格式
