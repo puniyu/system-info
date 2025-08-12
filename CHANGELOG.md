@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/Puniyu/system_info/compare/v0.3.0...v0.3.1) (2025-08-12)
+
+
+### 🔧 其他更新
+
+* **process:** 添加进程启动时间和运行时间字段 ([ed197a2](https://github.com/Puniyu/system_info/commit/ed197a25c24117d491eb8ce054b1760f1f0561ab))
+
 ## [0.3.0](https://github.com/Puniyu/system_info/compare/v0.2.1...v0.3.0) (2025-08-12)
 
 
