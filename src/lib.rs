@@ -53,6 +53,7 @@ pub struct CpuInfo {
 }
 
 #[derive(Debug)]
+#[cfg(feature = "gpu")]
 pub struct GpuInfo {
     /// GPU型号
     pub gpu_model: String,
