@@ -49,6 +49,10 @@ pub struct ProcessInfo {
     pub pid: Pid,
     /// 进程名称
     pub name: String,
+    /// 进程启动时间， 上海时区
+    pub start_time: String,
+    /// 进程运行时间 (例如: 1天2小时3分钟)
+    pub run_time: String,
     /// 进程CPU使用率
     pub cpu_usage: Option<u8>,
     /// 进程内存使用率
@@ -368,6 +372,18 @@ pub fn get_procss_info() -> ProcessInfo{
     } else {
         "Unknown".to_string()
     };
+    let start_time = process.map(|p| {
+        let utc_time = Utc.timestamp_opt(p.start_time() as i64, 0).unwrap();
+        let shanghai_offset = FixedOffset::east_opt(8 * 3600).unwrap();
+        utc_time.with_timezone(&shanghai_offset).format("%Y-%m-%d %H:%M:%S").to_string()
+    }).unwrap();
+    let run_time = process.map(|p| {
+        let current_time = System::uptime();
+        let process_start_time = p.start_time();
+        let elapsed_seconds = current_time.saturating_sub(process_start_time);
+
+        format_uptime(elapsed_seconds)
+    }).unwrap();
 
     let cpu_usage = process.map(|p| format_to_f32(p.cpu_usage(), 2) as u8);
 
@@ -385,6 +401,8 @@ pub fn get_procss_info() -> ProcessInfo{
     ProcessInfo {
         pid: current_pid,
         name,
+        start_time,
+        run_time,
         cpu_usage,
         memory_usage,
         used_memory,
@@ -401,3 +419,42 @@ where
     rounded.to_f32().unwrap_or(0.0)
 }
 
+/// 格式化运行时间，类似于JavaScript中的uptime格式
+///
+/// # 参数
+///
+/// * `seconds` - 运行时间，以秒为单位
+///
+/// # 返回值
+///
+/// 格式化后的时间字符串，例如 "1天2小时3分钟"
+fn format_uptime(seconds: u64) -> String {
+    let day = seconds / 86400;
+    let hour = (seconds % 86400) / 3600;
+    let min = (seconds % 3600) / 60;
+    let sec = seconds % 60;
+
+    let mut parts = Vec::new();
+
+    if day > 0 {
+        parts.push(format!("{}天", day));
+    }
+
+    if hour > 0 {
+        parts.push(format!("{}小时", hour));
+    }
+
+    if min > 0 {
+        parts.push(format!("{}分钟", min));
+    }
+
+    if day == 0 && (sec > 0 || parts.is_empty()) {
+        parts.push(format!("{}秒", sec));
+    }
+
+    if parts.is_empty() {
+        parts.push("0秒".to_string());
+    }
+
+    parts.join("")
+}

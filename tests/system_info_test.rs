@@ -4,8 +4,6 @@ use puniyu_system_info::{get_system_info};
 fn test_get_system_info() {
     let system_info = get_system_info();
 
-    assert!(true);
-
     println!("{:#?}", system_info);
 }
 
@@ -58,6 +56,8 @@ fn test_process_info() {
 
     println!("进程ID: {}", system_info.process.pid);
     println!("进程名称: {}", system_info.process.name);
+    println!("进程启动时间: {}", system_info.process.start_time);
+    println!("进程运行时间: {}", system_info.process.run_time);
 
     if let Some(cpu_usage) = system_info.process.cpu_usage {
         println!("进程CPU使用率: {}%", cpu_usage);
