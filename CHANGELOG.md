@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.0](https://github.com/Puniyu/system_info/compare/v0.3.1...v0.4.0) (2025-08-12)
+
+
+### ✨ 新功能
+
+* **network:** 添加网络信息获取功能 ([4a6a14f](https://github.com/Puniyu/system_info/commit/4a6a14ff8ec61238a6f5e9a97afe4459e1b53550))
+
+
+### 🎡 持续集成
+
+* 优化 GitHub Actions 工作流并修复代码 ([b867939](https://github.com/Puniyu/system_info/commit/b8679399454c57c6021f86fe144d1f86a4cfde44))
+
 ## [0.3.1](https://github.com/Puniyu/system_info/compare/v0.3.0...v0.3.1) (2025-08-12)
 
 
