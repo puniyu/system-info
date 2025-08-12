@@ -1,0 +1,36 @@
+[package]
+name = "puniyu_system_info"
+version = "0.1.0"
+edition = "2024"
+description = "奈柚核心，获取系统信息"
+keywords = ["system", "info"]
+license = "MIT"
+homepage = "https://github.com/puniyu/system_info"
+repository = "https://github.com/puniyu/system_info"
+
+
+[dependencies]
+sysinfo = { version = "0.37.0" }
+rust_decimal = { version = "1.37.2" }
+gfxinfo = "0.1.2"
+chrono = { version = "0.4" }
+
+[features]
+default = ["host", "cpu", "memory", "disk"]
+host = []
+cpu = []
+memory = []
+disk = []
+gpu = []
+
+[lints.clippy]
+uninlined_format_args = "allow"
+
+[profile.release]
+lto = "thin"
+panic = "abort"
+incremental = false
+
+[profile.dev]
+incremental = true
+
