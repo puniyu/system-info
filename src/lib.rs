@@ -2,9 +2,9 @@ use chrono::{offset::FixedOffset, TimeZone, Utc};
 #[cfg(feature = "gpu")]
 use gfxinfo::active_gpu;
 use rust_decimal::{prelude::{FromPrimitive, ToPrimitive}, Decimal};
-use std::env;
+use std::{env, process};
 use std::thread::sleep;
-use sysinfo::{Disks, System};
+use sysinfo::{Disks, Pid, ProcessesToUpdate, System};
 
 #[derive(Debug)]
 pub struct SystemInfo {
@@ -20,6 +20,9 @@ pub struct SystemInfo {
     /// 硬盘信息
     #[cfg(feature = "disk")]
     pub disk: DiskInfo,
+    /// 进程信息
+    #[cfg(feature = "process")]
+    pub process: ProcessInfo,
     /// GPU信息
     #[cfg(feature = "gpu")]
     pub gpu: Option<GpuInfo>,
@@ -38,6 +41,20 @@ pub struct HostInfo {
     pub os_type: String,
     /// 系统启动时间， 上海时区
     pub boot_time: String,
+}
+
+#[derive(Debug)]
+pub struct ProcessInfo {
+    /// 进程ID
+    pub pid: Pid,
+    /// 进程名称
+    pub name: String,
+    /// 进程CPU使用率
+    pub cpu_usage: Option<u8>,
+    /// 进程内存使用率
+    pub memory_usage: Option<u8>,
+    /// 进程已用内存(单位: MB)
+    pub used_memory: f32,
 }
 #[derive(Debug)]
 #[cfg(feature = "cpu")]
@@ -118,6 +135,7 @@ pub struct DiskInfo {
 /// * [SystemInfo] - 系统信息
 ///
 pub fn get_system_info() -> SystemInfo {
+    let process = get_procss_info() ;
     #[cfg(feature = "host")]
     let host = get_host_info();
     #[cfg(feature = "cpu")]
@@ -132,6 +150,8 @@ pub fn get_system_info() -> SystemInfo {
     SystemInfo {
         #[cfg(feature = "host")]
         host,
+        #[cfg(feature = "process")]
+        process,
         #[cfg(feature = "cpu")]
         cpu,
         #[cfg(feature = "memory")]
@@ -327,6 +347,47 @@ pub fn get_disk_info() -> DiskInfo {
         total_free_space: format_to_f32(total_free_space, 2),
         total_usage: format_to_f32(total_usage, 2),
         disks: disk_details,
+    }
+}
+
+
+/// 获取进程信息
+/// 此函数可以获取进程信息，包括进程ID、进程名称、CPU使用率、内存使用率、已用内存等
+/// # 返回值
+///
+/// * [ProcessInfo] - 进程信息
+#[cfg(feature = "process")]
+pub fn get_procss_info() -> ProcessInfo{
+    let current_pid = Pid::from_u32(process::id());
+    let mut system = System::new();
+    system.refresh_processes(ProcessesToUpdate::Some(&[current_pid]), true);
+    let process = system.process(current_pid);
+
+    let name = if let Some(process) = process {
+        process.name().to_string_lossy().into_owned()
+    } else {
+        "Unknown".to_string()
+    };
+
+    let cpu_usage = process.map(|p| format_to_f32(p.cpu_usage(), 2) as u8);
+
+    let memory_usage = process.map(|p| {
+        format_to_f32(p.memory() as f64 / (system.total_memory() as f64) * 100.0, 2) as u8
+    });
+
+    let used_memory = match process {
+        Some(process) => {
+            process.memory() as f32 / 1024.0 / 1024.0
+        }
+        None => 0.0
+    };
+
+    ProcessInfo {
+        pid: current_pid,
+        name,
+        cpu_usage,
+        memory_usage,
+        used_memory,
     }
 }
 

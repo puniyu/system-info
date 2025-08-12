@@ -48,6 +48,28 @@ fn test_cpu_info() {
     }
 }
 
+#[cfg(feature = "process")]
+#[test]
+fn test_process_info() {
+    let system_info = get_system_info();
+
+    assert!(system_info.process.pid.as_u32() > 0);
+    assert!(!system_info.process.name.is_empty());
+
+    println!("进程ID: {}", system_info.process.pid);
+    println!("进程名称: {}", system_info.process.name);
+
+    if let Some(cpu_usage) = system_info.process.cpu_usage {
+        println!("进程CPU使用率: {}%", cpu_usage);
+    }
+
+    if let Some(memory_usage) = system_info.process.memory_usage {
+        println!("进程内存使用率: {}%", memory_usage);
+    }
+
+    println!("进程已用内存: {:.2} MB", system_info.process.used_memory);
+}
+
 #[cfg(feature = "memory")]
 #[test]
 fn test_memory_info() {
