@@ -13,7 +13,7 @@ repository = "https://github.com/puniyu/system_info"
 [dependencies]
 sysinfo = { version = "0.37.0" }
 rust_decimal = { version = "1.37.2" }
-gfxinfo = "0.1.2"
+gfxinfo = { version = "0.1.2", optional = true }
 chrono = { version = "0.4" }
 
 [features]
@@ -23,7 +23,7 @@ process = []
 cpu = []
 memory = []
 disk = []
-gpu = []
+gpu = ["gfxinfo"]
 
 [lints.clippy]
 uninlined_format_args = "allow"
