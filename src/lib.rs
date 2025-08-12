@@ -139,7 +139,7 @@ pub struct DiskInfo {
 /// * [SystemInfo] - 系统信息
 ///
 pub fn get_system_info() -> SystemInfo {
-    let process = get_procss_info() ;
+    let process = get_process_info();
     #[cfg(feature = "host")]
     let host = get_host_info();
     #[cfg(feature = "cpu")]
@@ -361,7 +361,7 @@ pub fn get_disk_info() -> DiskInfo {
 ///
 /// * [ProcessInfo] - 进程信息
 #[cfg(feature = "process")]
-pub fn get_procss_info() -> ProcessInfo{
+pub fn get_process_info() -> ProcessInfo{
     let current_pid = Pid::from_u32(process::id());
     let mut system = System::new();
     system.refresh_processes(ProcessesToUpdate::Some(&[current_pid]), true);

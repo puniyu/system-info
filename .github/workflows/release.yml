@@ -39,12 +39,9 @@ jobs:
           config-file: .release-please-config.json
           manifest-file: .release-please-manifest.json
 
-  publish:
+  test:
     runs-on: ubuntu-latest
-    needs: release
-    env:
-      CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_API_TOKEN }}
-    if: needs.release.outputs.releases_created == 'true'
+    needs: [release]
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
@@ -60,6 +57,26 @@ jobs:
 
       - name: 单元测试
         run: cargo test
+
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [test, release]
+    env:
+      CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_API_TOKEN }}
+    if: needs.release.outputs.releases_created == 'true'
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+
+      - name: 设置 Rust 工具链
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 设置 Rust 缓存
+        uses: swatinem/rust-cache@v2
 
       - name: 发布
         run: cargo publish
