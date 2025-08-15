@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/Puniyu/system_info/compare/v0.5.1...v0.5.2) (2025-08-15)
+
+
+### 🔧 其他更新
+
+* **arch:** 添加系统架构信息 ([6c18183](https://github.com/Puniyu/system_info/commit/6c18183c360fbc65b02df141d3f1a7fe67d7dfc2))
+
 ## [0.5.1](https://github.com/Puniyu/system_info/compare/v0.5.0...v0.5.1) (2025-08-15)
 
 
