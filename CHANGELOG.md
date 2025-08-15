@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/Puniyu/system_info/compare/v0.4.0...v0.5.0) (2025-08-15)
+
+
+### ✨ 新功能
+
+* **memory:** 增加交换内存信息监控 ([a288fba](https://github.com/Puniyu/system_info/commit/a288fba8423d17df2f9dc00a087a959e9643b339))
+
 ## [0.4.0](https://github.com/Puniyu/system_info/compare/v0.3.1...v0.4.0) (2025-08-12)
 
 
