@@ -44,6 +44,8 @@ pub struct HostInfo {
     pub os_version: String,
     /// 操作系统类型
     pub os_type: String,
+    /// 系统架构
+    pub arch: String,
     /// 系统启动时间， 上海时区
     pub boot_time: String,
     /// 系统运行时间
@@ -267,6 +269,7 @@ pub fn get_cpu_info() -> CpuInfo {
 pub fn get_host_info() -> HostInfo {
     let hostname = System::host_name().unwrap();
     let os_name = System::name().unwrap();
+    let arch = System::cpu_arch();
     let os_version = System::os_version().unwrap();
     let os_type = env::consts::OS.to_string();
     let boot_time_timestamp = System::boot_time();
@@ -283,6 +286,7 @@ pub fn get_host_info() -> HostInfo {
     HostInfo {
         host_name: hostname,
         os_name,
+        arch,
         os_version,
         os_type,
         boot_time,
