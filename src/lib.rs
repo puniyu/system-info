@@ -46,6 +46,8 @@ pub struct HostInfo {
     pub os_type: String,
     /// 系统启动时间， 上海时区
     pub boot_time: String,
+    /// 系统运行时间
+    pub uptime: String,
 }
 
 #[derive(Debug)]
@@ -273,12 +275,18 @@ pub fn get_host_info() -> HostInfo {
         let shanghai_offset = FixedOffset::east_opt(8 * 3600).unwrap();
         utc_time.with_timezone(&shanghai_offset).format("%Y-%m-%d %H:%M:%S").to_string()
     };
+
+    let uptime = {
+        let uptime_seconds = System::uptime();
+        format_uptime(uptime_seconds)
+    };
     HostInfo {
         host_name: hostname,
         os_name,
         os_version,
         os_type,
-        boot_time
+        boot_time,
+        uptime,
     }
 }
 /// 获取GPU信息
