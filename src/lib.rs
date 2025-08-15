@@ -126,6 +126,14 @@ pub struct MemoryInfo {
     pub used_memory: f32,
     /// 可用内存(单位: MB)
     pub free_memory: f32,
+    /// 交换内存(单位: MB)
+    pub swap_memory_total: f32,
+    /// 交换内存已用(单位: MB)
+    pub swap_memory_used: f32,
+    /// 交换内存可用(单位: MB)
+    pub swap_memory_free: f32,
+    /// 交换内存使用率
+    pub swap_memory_usage: Option<u8>,
     /// 内存使用率
     pub memory_usage: Option<u8>,
 }
@@ -315,19 +323,40 @@ pub fn get_memory_info() -> MemoryInfo {
 
     let total_memory = system.total_memory() / 1024 / 1024;
     let used_memory = system.used_memory() / 1024 / 1024;
-    let free_memory = system.free_memory() / 1024 / 1024;
+    let free_memory = total_memory - used_memory;
+
+    let swap_memory_total = system.total_swap() / 1024 / 1024;
+    let swap_memory_used = system.used_swap() / 1024 / 1024;
+    let swap_memory_free = swap_memory_total - swap_memory_used;
 
     let total_memory_f32 = format_to_f32(total_memory as f32, 2);
     let used_memory_f32 = format_to_f32(used_memory as f32, 2);
     let free_memory_f32 = format_to_f32(free_memory as f32, 2);
 
-    let memory_usage = Some(((used_memory as f32 / total_memory as f32) * 100.0) as u8);
+    let swap_memory_usage_f32 = format_to_f32(swap_memory_used as f32, 2);
+    let swap_memory_free_f32 = format_to_f32(swap_memory_free as f32, 2);
+    let swap_memory_total_f32 = format_to_f32(swap_memory_total as f32, 2);
+
+    let memory_usage = if total_memory > 0 {
+        Some(((used_memory as f32 / total_memory as f32) * 100.0) as u8)
+    } else {
+        None
+    };
+    let swap_memory_usage = if swap_memory_total > 0 {
+        Some(((swap_memory_used as f32 / swap_memory_total as f32) * 100.0) as u8)
+    } else {
+        None
+    };
 
     MemoryInfo {
         total_memory: total_memory_f32,
         used_memory: used_memory_f32,
         free_memory: free_memory_f32,
         memory_usage,
+        swap_memory_total: swap_memory_total_f32,
+        swap_memory_used: swap_memory_usage_f32,
+        swap_memory_free: swap_memory_free_f32,
+        swap_memory_usage,
     }
 }
 
