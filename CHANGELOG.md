@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/Puniyu/system_info/compare/v0.5.0...v0.5.1) (2025-08-15)
+
+
+### 🔧 其他更新
+
+* **uptime:** 添加系统运行时间字段 ([107e8c2](https://github.com/Puniyu/system_info/commit/107e8c25781dd4561fa0182ad8497b0f3ec395d9))
+
 ## [0.5.0](https://github.com/Puniyu/system_info/compare/v0.4.0...v0.5.0) (2025-08-15)
 
 
