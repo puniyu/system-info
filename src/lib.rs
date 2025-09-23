@@ -8,7 +8,7 @@ use std::net::IpAddr;
 use std::thread::sleep;
 use sysinfo::{Disks, Pid, ProcessesToUpdate, System, Networks, MacAddr};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SystemInfo {
     /// 主机信息
     #[cfg(feature = "host")]
@@ -33,7 +33,7 @@ pub struct SystemInfo {
     pub gpu: Option<GpuInfo>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[cfg(feature = "host")]
 pub struct HostInfo {
     /// 主机名
@@ -52,7 +52,7 @@ pub struct HostInfo {
     pub uptime: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[cfg(feature = "network")]
 pub struct NetworkInfo {
     /// 网卡名称
@@ -67,7 +67,7 @@ pub struct NetworkInfo {
     pub mac_addr: MacAddr,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[cfg(feature = "network")]
 pub struct IpInfo {
     /// ip地址
@@ -76,7 +76,7 @@ pub struct IpInfo {
     pub netmask: u8,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ProcessInfo {
     /// 进程ID
     pub pid: Pid,
@@ -93,7 +93,7 @@ pub struct ProcessInfo {
     /// 进程已用内存(单位: MB)
     pub used_memory: f32,
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[cfg(feature = "cpu")]
 pub struct CpuInfo {
     /// CPU型号
@@ -106,7 +106,7 @@ pub struct CpuInfo {
     pub cpu_usage: Option<u8>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[cfg(feature = "gpu")]
 pub struct GpuInfo {
     /// GPU型号
@@ -121,7 +121,7 @@ pub struct GpuInfo {
     pub gpu_usage: u8,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[cfg(feature = "memory")]
 pub struct MemoryInfo {
     /// 总内存(单位: MB)
@@ -142,7 +142,7 @@ pub struct MemoryInfo {
     pub memory_usage: Option<u8>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[cfg(feature = "disk")]
 pub struct DiskDetail {
     /// 磁盘名称
@@ -157,7 +157,7 @@ pub struct DiskDetail {
     pub usage: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[cfg(feature = "disk")]
 pub struct DiskInfo {
     /// 总磁盘空间(单位: GB)
