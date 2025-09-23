@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.3](https://github.com/Puniyu/system-info/compare/v0.5.2...v0.5.3) (2025-09-23)
+
+
+### 🐛 错误修复
+
+* **system:** 为所有信息结构体添加 Clone 派生 ([e39a09c](https://github.com/Puniyu/system-info/commit/e39a09c85b438dd76859f6cc9042238e4f7f5bcd))
+
 ## [0.5.2](https://github.com/Puniyu/system_info/compare/v0.5.1...v0.5.2) (2025-08-15)
 
 
