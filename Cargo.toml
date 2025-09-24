@@ -26,9 +26,6 @@ network = []
 disk = []
 gpu = ["gfxinfo"]
 
-[lints.clippy]
-uninlined_format_args = "allow"
-
 [profile.release]
 lto = "thin"
 panic = "abort"
