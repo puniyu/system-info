@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.4](https://github.com/Puniyu/system-info/compare/v0.5.3...v0.5.4) (2025-09-24)
+
+
+### 🔧 其他更新
+
+* **config:** 添加 Rust 项目配置文件 ([a7d5c5d](https://github.com/Puniyu/system-info/commit/a7d5c5df90dd3120b023009d4875842cd8098daf))
+
 ## [0.5.3](https://github.com/Puniyu/system-info/compare/v0.5.2...v0.5.3) (2025-09-23)
 
 
