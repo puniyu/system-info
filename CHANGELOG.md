@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.5](https://github.com/Puniyu/system-info/compare/v0.5.4...v0.5.5) (2025-09-24)
+
+
+### ♻️ 代码重构
+
+* **process:** 优化运行时间计算逻辑 ([d3218eb](https://github.com/Puniyu/system-info/commit/d3218ebbedded369095b509a32018515c2263281))
+
 ## [0.5.4](https://github.com/Puniyu/system-info/compare/v0.5.3...v0.5.4) (2025-09-24)
 
 
