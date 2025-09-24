@@ -2,11 +2,11 @@ use chrono::{offset::FixedOffset, TimeZone, Utc};
 #[cfg(feature = "gpu")]
 use gfxinfo::active_gpu;
 use rust_decimal::{prelude::{FromPrimitive, ToPrimitive}, Decimal};
-use std::{env, process};
 #[cfg(feature = "network")]
 use std::net::IpAddr;
 use std::thread::sleep;
-use sysinfo::{Disks, Pid, ProcessesToUpdate, System, Networks, MacAddr};
+use std::{env, process};
+use sysinfo::{Disks, MacAddr, Networks, Pid, ProcessesToUpdate, System};
 
 #[derive(Debug, Clone)]
 pub struct SystemInfo {
@@ -561,7 +561,6 @@ pub fn get_process_info() -> ProcessInfo{
         let current_time = System::uptime();
         let process_start_time = p.start_time();
         let elapsed_seconds = current_time.saturating_sub(process_start_time);
-
         format_uptime(elapsed_seconds)
     }).unwrap();
 

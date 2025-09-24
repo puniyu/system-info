@@ -3,7 +3,7 @@
   "extends": ["github>puniyu/github-action//.github/renovate"],
   "packageRules": [
     {
-      "groupName": "puniyu core packages",
+      "groupName": "puniyu system_info packages",
       "matchManagers": ["cargo"],
       "rangeStrategy": "auto",
       "schedule": ["at any time"],
