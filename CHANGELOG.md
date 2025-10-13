@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.5.6](https://github.com/puniyu/system-info/compare/v0.5.5...v0.5.6) (2025-10-13)
+
+
+### 🔧 其他更新
+
+* **deps:** update puniyu system_info packages ([78fe851](https://github.com/puniyu/system-info/commit/78fe851fccec30a2d7b12df382a849bc1c910497))
+* **release:** 更新发布工作流配置 ([b021745](https://github.com/puniyu/system-info/commit/b0217457e01b14cc6dc37202e8598642f071cf18))
+
+
+### ♻️ 代码重构
+
+* **system:** 重构系统信息获取逻辑 ([6c57aaa](https://github.com/puniyu/system-info/commit/6c57aaabb9662f2020cb9d3e97ab1f73282a5cc3))
+
 ## [0.5.5](https://github.com/Puniyu/system-info/compare/v0.5.4...v0.5.5) (2025-09-24)
 
 
