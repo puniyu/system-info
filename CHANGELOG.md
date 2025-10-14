@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.7](https://github.com/puniyu/system-info/compare/v0.5.6...v0.5.7) (2025-10-14)
+
+
+### ♻️ 代码重构
+
+* **lib:** 修改系统和进程时间字段类型为u64 ([74078ec](https://github.com/puniyu/system-info/commit/74078ec1d84353fd9aab846e062b171f3f2247a1))
+
 ## [0.5.6](https://github.com/puniyu/system-info/compare/v0.5.5...v0.5.6) (2025-10-13)
 
 
