@@ -1,4 +1,3 @@
-use chrono::{TimeZone, Utc, offset::FixedOffset};
 #[cfg(feature = "gpu")]
 use gfxinfo::active_gpu;
 use rust_decimal::{
@@ -26,10 +25,10 @@ pub struct HostInfo {
 	pub os_type: String,
 	/// 系统架构
 	pub arch: String,
-	/// 系统启动时间， 上海时区
-	pub boot_time: String,
-	/// 系统运行时间
-	pub uptime: String,
+	/// 系统启动时间
+	pub boot_time: u64,
+	/// 系统运行时间， 单位：毫秒
+	pub uptime: u64,
 }
 
 #[derive(Debug, Clone)]
@@ -62,10 +61,10 @@ pub struct ProcessInfo {
 	pub pid: Pid,
 	/// 进程名称
 	pub name: String,
-	/// 进程启动时间， 上海时区
-	pub start_time: String,
-	/// 进程运行时间 (例如: 1天2小时3分钟)
-	pub run_time: String,
+	/// 进程启动时间
+	pub start_time: u64,
+	/// 进程运行时间，单位：毫秒
+	pub run_time: u64,
 	/// 进程CPU使用率
 	pub cpu_usage: Option<u8>,
 	/// 进程内存使用率
@@ -152,45 +151,6 @@ pub struct DiskInfo {
 	pub disks: Vec<DiskDetail>,
 }
 
-/// 格式化运行时间，类似于JavaScript中的uptime格式
-///
-/// # 参数
-///
-/// * `seconds` - 运行时间，以秒为单位
-///
-/// # 返回值
-///
-/// 格式化后的时间字符串，例如 "1天2小时3分钟"
-fn format_uptime(seconds: u64) -> String {
-	let day = seconds / 86400;
-	let hour = (seconds % 86400) / 3600;
-	let min = (seconds % 3600) / 60;
-	let sec = seconds % 60;
-
-	let mut parts = Vec::new();
-
-	if day > 0 {
-		parts.push(format!("{}天", day));
-	}
-
-	if hour > 0 {
-		parts.push(format!("{}小时", hour));
-	}
-
-	if min > 0 {
-		parts.push(format!("{}分钟", min));
-	}
-
-	if day == 0 && (sec > 0 || parts.is_empty()) {
-		parts.push(format!("{}秒", sec));
-	}
-
-	if parts.is_empty() {
-		parts.push("0秒".to_string());
-	}
-
-	parts.join("")
-}
 
 #[derive(Debug, Clone)]
 pub struct SystemInfo;
@@ -212,17 +172,8 @@ impl SystemInfo {
 		let arch = System::cpu_arch();
 		let os_version = System::os_version().unwrap();
 		let os_type = env::consts::OS.to_string();
-		let boot_time_timestamp = System::boot_time();
-		let boot_time = {
-			let utc_time = Utc.timestamp_opt(boot_time_timestamp as i64, 0).unwrap();
-			let shanghai_offset = FixedOffset::east_opt(8 * 3600).unwrap();
-			utc_time.with_timezone(&shanghai_offset).format("%Y-%m-%d %H:%M:%S").to_string()
-		};
-
-		let uptime = {
-			let uptime_seconds = System::uptime();
-			format_uptime(uptime_seconds)
-		};
+		let boot_time = System::boot_time();
+		let uptime = System::uptime() * 1000;
 		HostInfo { host_name: hostname, os_name, arch, os_version, os_type, boot_time, uptime }
 	}
 
@@ -485,6 +436,7 @@ impl SystemInfo {
 	pub fn process() -> ProcessInfo {
 		use std::process;
 		use sysinfo::System;
+		use std::time::{SystemTime, UNIX_EPOCH};
 		let current_pid = Pid::from_u32(process::id());
 		let mut system = System::new();
 		system.refresh_processes(ProcessesToUpdate::Some(&[current_pid]), true);
@@ -495,24 +447,17 @@ impl SystemInfo {
 		} else {
 			"Unknown".to_string()
 		};
-		let start_time = process
-			.map(|p| {
-				let utc_time = Utc.timestamp_opt(p.start_time() as i64, 0).unwrap();
-				let shanghai_offset = FixedOffset::east_opt(8 * 3600).unwrap();
-				utc_time.with_timezone(&shanghai_offset).format("%Y-%m-%d %H:%M:%S").to_string()
-			})
-			.unwrap();
+		let start_time = process.map(|p| p.start_time()).unwrap_or(0);
 		let run_time = process
 			.map(|p| {
-				let current_time = std::time::SystemTime::now()
-					.duration_since(std::time::UNIX_EPOCH)
+				let current_time = SystemTime::now()
+					.duration_since(UNIX_EPOCH)
 					.unwrap()
 					.as_secs();
-				let process_start_time = p.start_time();
-				let elapsed_seconds = current_time.saturating_sub(process_start_time);
-				format_uptime(elapsed_seconds)
+				let process_start_time = p.start_time() * 1000;
+				current_time.saturating_sub(process_start_time)
 			})
-			.unwrap();
+			.unwrap_or(0);
 
 		let cpu_usage = process.map(|p| format_float(p.cpu_usage() as f64, 2) as u8);
 

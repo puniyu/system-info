@@ -6,19 +6,12 @@ use puniyu_system_info::{SystemInfo};
 fn test_host_info() {
     let host_info = SystemInfo::host();
 
-    println!("主机信息: {:#?}", host_info);
-
     assert!(!host_info.host_name.is_empty());
     assert!(!host_info.os_name.is_empty());
     assert!(!host_info.os_version.is_empty());
     assert!(!host_info.os_type.is_empty());
-    assert!(!host_info.boot_time.is_empty());
+    assert!(host_info.boot_time > 0);
 
-    println!("主机名: {}", host_info.host_name);
-    println!("操作系统: {}", host_info.os_name);
-    println!("系统版本: {}", host_info.os_version);
-    println!("系统类型: {}", host_info.os_type);
-    println!("启动时间: {}", host_info.boot_time);
 }
 
 #[cfg(feature = "cpu")]
@@ -26,21 +19,18 @@ fn test_host_info() {
 fn test_cpu_info() {
     let cpu_info = SystemInfo::cpu();
 
-    println!("CPU信息: {:#?}", cpu_info);
 
     assert!(!cpu_info.cpu_model.is_empty());
     assert!(cpu_info.cpu_cores > 0);
 
-    println!("CPU型号: {}", cpu_info.cpu_model);
-    println!("CPU核心数: {}", cpu_info.cpu_cores);
-
     if let Some(frequency) = cpu_info.cpu_frequency {
-        println!("CPU频率: {} GHz", frequency);
+        assert!(frequency > 0.0);
     }
 
     if let Some(usage) = cpu_info.cpu_usage {
-        println!("CPU使用率: {}%", usage);
+        assert!(usage <= 100);
     }
+
 }
 
 #[cfg(feature = "process")]
@@ -48,25 +38,20 @@ fn test_cpu_info() {
 fn test_process_info() {
     let process_info = SystemInfo::process();
 
-    println!("进程信息: {:#?}", process_info);
-
     assert!(process_info.pid.as_u32() > 0);
     assert!(!process_info.name.is_empty());
 
-    println!("进程ID: {}", process_info.pid);
-    println!("进程名称: {}", process_info.name);
-    println!("进程启动时间: {}", process_info.start_time);
-    println!("进程运行时间: {}", process_info.run_time);
+    assert!(process_info.start_time > 0);
+
+    assert!(process_info.used_memory >= 0.0);
 
     if let Some(cpu_usage) = process_info.cpu_usage {
-        println!("进程CPU使用率: {}%", cpu_usage);
+        assert!(cpu_usage <= 100);
     }
 
     if let Some(memory_usage) = process_info.memory_usage {
-        println!("进程内存使用率: {}%", memory_usage);
+        assert!(memory_usage <= 100);
     }
-
-    println!("进程已用内存: {:.2} MB", process_info.used_memory);
 }
 
 #[cfg(feature = "memory")]
