@@ -27,7 +27,7 @@ pub struct HostInfo {
 	pub arch: String,
 	/// 系统启动时间
 	pub boot_time: u64,
-	/// 系统运行时间， 单位：毫秒
+	/// 系统运行时间， 单位：秒
 	pub uptime: u64,
 }
 
@@ -63,7 +63,7 @@ pub struct ProcessInfo {
 	pub name: String,
 	/// 进程启动时间
 	pub start_time: u64,
-	/// 进程运行时间，单位：毫秒
+	/// 进程运行时间，单位：秒
 	pub run_time: u64,
 	/// 进程CPU使用率
 	pub cpu_usage: Option<u8>,
@@ -173,7 +173,7 @@ impl SystemInfo {
 		let os_version = System::os_version().unwrap();
 		let os_type = env::consts::OS.to_string();
 		let boot_time = System::boot_time();
-		let uptime = System::uptime() * 1000;
+		let uptime = System::uptime();
 		HostInfo { host_name: hostname, os_name, arch, os_version, os_type, boot_time, uptime }
 	}
 
@@ -454,7 +454,7 @@ impl SystemInfo {
 					.duration_since(UNIX_EPOCH)
 					.unwrap()
 					.as_secs();
-				let process_start_time = p.start_time() * 1000;
+				let process_start_time = p.start_time();
 				current_time.saturating_sub(process_start_time)
 			})
 			.unwrap_or(0);

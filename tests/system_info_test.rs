@@ -41,7 +41,11 @@ fn test_process_info() {
     assert!(process_info.pid.as_u32() > 0);
     assert!(!process_info.name.is_empty());
 
+    std::thread::sleep(std::time::Duration::from_secs(1));
+
+    let process_info = SystemInfo::process();
     assert!(process_info.start_time > 0);
+    assert!(process_info.run_time > 0);
 
     assert!(process_info.used_memory >= 0.0);
 
