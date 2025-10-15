@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.8](https://github.com/puniyu/system-info/compare/v0.5.7...v0.5.8) (2025-10-15)
+
+
+### 🔧 其他更新
+
+* **system:** 修改系统和进程运行时间单位为秒 ([5653a5e](https://github.com/puniyu/system-info/commit/5653a5ee74b692a57077ad7728b6176fd1c9c8cb))
+
 ## [0.5.7](https://github.com/puniyu/system-info/compare/v0.5.6...v0.5.7) (2025-10-14)
 
 
