@@ -580,7 +580,7 @@ dependencies = [
 
 [[package]]
 name = "puniyu_system_info"
-version = "0.5.7"
+version = "0.5.8"
 dependencies = [
  "gfxinfo",
  "rust_decimal",
