@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/puniyu/system-info/compare/v0.5.8...v0.6.0) (2025-10-18)
+
+
+### ✨ 新功能
+
+* **process:** 添加通过 PID 获取进程信息的功能 ([b64fe19](https://github.com/puniyu/system-info/commit/b64fe198f45050882fb8c02df0232ab3e7fc6b2a))
+
 ## [0.5.8](https://github.com/puniyu/system-info/compare/v0.5.7...v0.5.8) (2025-10-15)
 
 
