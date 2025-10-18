@@ -5,7 +5,7 @@ use rust_decimal::{
 	prelude::{FromPrimitive, ToPrimitive},
 };
 #[cfg(feature = "process")]
-use sysinfo::{Pid, ProcessesToUpdate};
+pub use sysinfo::Pid;
 #[cfg(feature = "network")]
 use {
 	std::net::IpAddr,
@@ -150,7 +150,6 @@ pub struct DiskInfo {
 	/// 各个磁盘详细信息
 	pub disks: Vec<DiskDetail>,
 }
-
 
 #[derive(Debug, Clone)]
 pub struct SystemInfo;
@@ -441,8 +440,8 @@ impl SystemInfo {
 
 	#[cfg(feature = "process")]
 	pub fn process_with_pid(pid: Pid) -> ProcessInfo {
-		use sysinfo::System;
 		use std::time::{SystemTime, UNIX_EPOCH};
+		use sysinfo::{ProcessesToUpdate, System};
 		let mut system = System::new();
 		system.refresh_processes(ProcessesToUpdate::Some(&[pid]), true);
 		let process = system.process(pid);
@@ -455,10 +454,7 @@ impl SystemInfo {
 		let start_time = process.map(|p| p.start_time()).unwrap_or(0);
 		let run_time = process
 			.map(|p| {
-				let current_time = SystemTime::now()
-					.duration_since(UNIX_EPOCH)
-					.unwrap()
-					.as_secs();
+				let current_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
 				let process_start_time = p.start_time();
 				current_time.saturating_sub(process_start_time)
 			})
@@ -475,15 +471,7 @@ impl SystemInfo {
 			None => 0.0,
 		};
 
-		ProcessInfo {
-			pid,
-			name,
-			start_time,
-			run_time,
-			cpu_usage,
-			memory_usage,
-			used_memory,
-		}
+		ProcessInfo { pid, name, start_time, run_time, cpu_usage, memory_usage, used_memory }
 	}
 
 	/// 获取GPU信息
@@ -500,7 +488,8 @@ impl SystemInfo {
 			Ok(gpu) => {
 				let info = gpu.info();
 				let gpu_usage = format_float(info.used_vram() as f64 / (1024.0 * 1024.0), 2) as f32;
-				let gpu_total = format_float(info.total_vram() as f64 / (1024.0 * 1024.0), 2) as f32;
+				let gpu_total =
+					format_float(info.total_vram() as f64 / (1024.0 * 1024.0), 2) as f32;
 				Some(GpuInfo {
 					gpu_model: gpu.model().to_string(),
 					gpu_memory_used: gpu_usage,
