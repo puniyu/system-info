@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.1](https://github.com/puniyu/system-info/compare/v0.6.0...v0.6.1) (2025-10-18)
+
+
+### ♻️ 代码重构
+
+* **process:** 简化进程信息获取逻辑 ([01b946d](https://github.com/puniyu/system-info/commit/01b946dcb6dce59ffee7f11c70c21db73df36cd9))
+* **process:** 调整进程相关模块的导入和使用方式- 修改 sysinfo 导入路径，将 Pid 重新导出为公共接口 ([7a3994a](https://github.com/puniyu/system-info/commit/7a3994a99a61519f1e6e3220229a7fdbca8deb6d))
+
 ## [0.6.0](https://github.com/puniyu/system-info/compare/v0.5.8...v0.6.0) (2025-10-18)
 
 
