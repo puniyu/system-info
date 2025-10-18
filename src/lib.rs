@@ -434,15 +434,15 @@ impl SystemInfo {
 	#[cfg(feature = "process")]
 	pub fn process() -> ProcessInfo {
 		use std::process;
-		let current_pid = Pid::from_u32(process::id());
-		Self::process_with_pid(current_pid)
+		Self::process_with_pid(process::id())
 	}
 
 	#[cfg(feature = "process")]
-	pub fn process_with_pid(pid: Pid) -> ProcessInfo {
+	pub fn process_with_pid(pid: u32) -> ProcessInfo {
 		use std::time::{SystemTime, UNIX_EPOCH};
 		use sysinfo::{ProcessesToUpdate, System};
 		let mut system = System::new();
+		let pid = Pid::from_u32(pid);
 		system.refresh_processes(ProcessesToUpdate::Some(&[pid]), true);
 		let process = system.process(pid);
 
