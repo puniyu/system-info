@@ -435,12 +435,17 @@ impl SystemInfo {
 	#[cfg(feature = "process")]
 	pub fn process() -> ProcessInfo {
 		use std::process;
+		let current_pid = Pid::from_u32(process::id());
+		Self::process_with_pid(current_pid)
+	}
+
+	#[cfg(feature = "process")]
+	pub fn process_with_pid(pid: Pid) -> ProcessInfo {
 		use sysinfo::System;
 		use std::time::{SystemTime, UNIX_EPOCH};
-		let current_pid = Pid::from_u32(process::id());
 		let mut system = System::new();
-		system.refresh_processes(ProcessesToUpdate::Some(&[current_pid]), true);
-		let process = system.process(current_pid);
+		system.refresh_processes(ProcessesToUpdate::Some(&[pid]), true);
+		let process = system.process(pid);
 
 		let name = if let Some(process) = process {
 			process.name().to_string_lossy().into_owned()
@@ -471,7 +476,7 @@ impl SystemInfo {
 		};
 
 		ProcessInfo {
-			pid: current_pid,
+			pid,
 			name,
 			start_time,
 			run_time,
