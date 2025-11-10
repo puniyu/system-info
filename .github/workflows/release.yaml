@@ -22,6 +22,7 @@ jobs:
     outputs:
       core: ${{ steps.release-please.outputs['system_info_core--release_created'] }}
       node: ${{ steps.release-please.outputs['system_info_node--release_created'] }}
+      node_tag_name: ${{ steps.release-please.outputs['system_info_node--tag_name'] }}
     steps:
       - name: 获取token
         uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2

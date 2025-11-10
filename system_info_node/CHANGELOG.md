@@ -1,4 +1,4 @@
-# Changelog
+# 变更日志
 
 ## [1.1.5](https://github.com/puniyu/system-info/compare/node-v1.1.4...node-v1.1.5) (2025-11-10)
 

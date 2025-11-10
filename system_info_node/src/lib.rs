@@ -46,7 +46,7 @@ pub fn get_memory_info() -> types::MemoryInfo {
 }
 
 #[napi]
-/// 获取磁盘信息
+/// 获取硬盘信息
 pub fn get_disk_info() -> types::DiskInfo {
 	SystemInfo::disk().into()
 }
