@@ -1,5 +1,12 @@
 # 变更日志
 
+## [1.1.6](https://github.com/puniyu/system-info/compare/node-v1.1.5...node-v1.1.6) (2025-11-10)
+
+
+### 🔧 其他更新
+
+* **workflow:** 添加node标签名称输出 ([44cd096](https://github.com/puniyu/system-info/commit/44cd096c06cdeeaaf12508bbc6270ac39ffcdbbb))
+
 ## [1.1.5](https://github.com/puniyu/system-info/compare/node-v1.1.4...node-v1.1.5) (2025-11-10)
 
 
