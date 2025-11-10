@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/puniyu/system-info/compare/node-v1.1.0...node-v1.1.1) (2025-11-10)
+
+
+### 📦️ 构建系统
+
+* **workflow:** 添加构建所需 apt 包并更新依赖版本 ([bbd9b0f](https://github.com/puniyu/system-info/commit/bbd9b0f93700d00f957b89be9a62a85f0daf151b))
+
 ## [1.1.0](https://github.com/puniyu/system-info/compare/node-v1.0.0...node-v1.1.0) (2025-11-10)
 
 
