@@ -24,5 +24,5 @@ system_info = { path = "../system_info_core", features = ["full"], package = "pu
 
 
 [build-dependencies]
-napi-build = "=2.3.0"
+napi-build = "=2.3.1"
 
