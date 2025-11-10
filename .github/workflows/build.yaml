@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 env:
-  APP_NAME: system_info
+  APP_NAME: system-info
 
 jobs:
   build_windows:

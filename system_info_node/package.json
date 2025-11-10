@@ -18,6 +18,7 @@
     "Rust",
     "node-addon",
     "node-addon-api",
+    "system",
     "system-info"
   ],
   "files": [
