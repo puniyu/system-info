@@ -9,6 +9,7 @@
   "repository": "https://github.com/puniyu/system-info",
   "license": "MIT",
   "keywords": [
+    "NAPI",
     "napi-rs",
     "system",
     "system-info"
