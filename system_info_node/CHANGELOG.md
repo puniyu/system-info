@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.5](https://github.com/puniyu/system-info/compare/node-v1.1.4...node-v1.1.5) (2025-11-10)
+
+
+### 🔧 其他更新
+
+* **deps:** 更新 system_info_node 包配置 ([9dcb771](https://github.com/puniyu/system-info/commit/9dcb771968190b52002c44c28e0b9126a373b6ff))
+
 ## [1.1.4](https://github.com/puniyu/system-info/compare/node-v1.1.3...node-v1.1.4) (2025-11-10)
 
 
