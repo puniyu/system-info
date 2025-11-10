@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.4](https://github.com/puniyu/system-info/compare/node-v1.1.3...node-v1.1.4) (2025-11-10)
+
+
+### 🎡 持续集成
+
+* **workflow:** 更新发布工作流权限配置 ([39f6818](https://github.com/puniyu/system-info/commit/39f6818dfa9fb2af62a3ea39dc6aa743b522a841))
+
 ## [1.1.3](https://github.com/puniyu/system-info/compare/node-v1.1.2...node-v1.1.3) (2025-11-10)
 
 
