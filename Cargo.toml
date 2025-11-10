@@ -1,29 +1,21 @@
-[package]
-name = "puniyu_system_info"
-version = "0.6.1"
-edition = "2024"
-description = "奈柚核心，获取系统信息"
-keywords = ["system", "info"]
+[workspace]
+members = [
+    "system_info_core",
+    "system_info_node"
+]
+resolver = "2"
+
+[workspace.package]
+authors = ["wuliya <3369906077@qq.com>"]
 license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/puniyu/system_info"
 repository = "https://github.com/puniyu/system_info"
+edition = "2024"
+rust-version = "1.88.0"
 
-
-[dependencies]
-sysinfo = { version = "0.37.0" }
-rust_decimal = { version = "1.37.2" }
-gfxinfo = { version = "0.1.2", optional = true }
-
-[features]
-default = ["host", "process", "cpu", "memory","network", "disk"]
-host = []
-process = []
-cpu = []
-memory = []
-network = []
-disk = []
-gpu = ["gfxinfo"]
+[workspace.dependencies]
+chrono = { version = "=0.4.42", features = ["serde"] }
 
 [profile.release]
 lto = "thin"

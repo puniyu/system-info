@@ -1,0 +1,27 @@
+[package]
+name = "puniyu_system_info"
+version = "0.6.1"
+edition.workspace = true
+description = "puniyu, 获取系统信息"
+keywords = ["system", "info"]
+license.workspace = true
+readme = "README.md"
+homepage.workspace = true
+repository.workspace = true
+
+[dependencies]
+sysinfo = { version = "0.37.0" }
+rust_decimal = { version = "1.37.2" }
+gfxinfo = { version = "0.1.2", optional = true }
+chrono.workspace = true
+
+[features]
+default = ["host", "process", "cpu", "memory","network", "disk"]
+host = []
+process = []
+cpu = []
+memory = []
+network = []
+disk = []
+gpu = ["dep:gfxinfo"]
+full = ["default", "gpu"]

@@ -1,3 +1,4 @@
+use chrono::{DateTime, TimeZone, Utc};
 #[cfg(feature = "gpu")]
 use gfxinfo::active_gpu;
 use rust_decimal::{
@@ -26,7 +27,7 @@ pub struct HostInfo {
 	/// 系统架构
 	pub arch: String,
 	/// 系统启动时间
-	pub boot_time: u64,
+	pub boot_time: DateTime<Utc>,
 	/// 系统运行时间， 单位：秒
 	pub uptime: u64,
 }
@@ -56,6 +57,7 @@ pub struct IpInfo {
 }
 
 #[derive(Debug, Clone)]
+#[cfg(feature = "process")]
 pub struct ProcessInfo {
 	/// 进程ID
 	pub pid: Pid,
@@ -70,7 +72,7 @@ pub struct ProcessInfo {
 	/// 进程内存使用率
 	pub memory_usage: Option<u8>,
 	/// 进程已用内存(单位: MB)
-	pub used_memory: f32,
+	pub used_memory: f64,
 }
 #[derive(Debug, Clone)]
 #[cfg(feature = "cpu")]
@@ -89,36 +91,36 @@ pub struct CpuInfo {
 #[cfg(feature = "gpu")]
 pub struct GpuInfo {
 	/// GPU型号
-	pub gpu_model: String,
+	pub model: String,
 	///  GPU已用内存(单位: MB)
-	pub gpu_memory_used: f32,
+	pub memory_used: f32,
 	/// GPU总内存(单位: MB)
-	pub gpu_memory_total: f32,
+	pub memory_total: f32,
 	///  GPU可用内存(单位: MB)
-	pub gpu_memory_free: f32,
+	pub memory_free: f32,
 	/// GPU使用率
-	pub gpu_usage: u8,
+	pub usage: u8,
 }
 
 #[derive(Debug, Clone)]
 #[cfg(feature = "memory")]
 pub struct MemoryInfo {
 	/// 总内存(单位: MB)
-	pub total_memory: f32,
+	pub total: f32,
+	/// 内存使用率
+	pub usage: Option<u8>,
 	/// 已用内存(单位: MB)
 	pub used_memory: f32,
 	/// 可用内存(单位: MB)
 	pub free_memory: f32,
 	/// 交换内存(单位: MB)
-	pub swap_memory_total: f32,
+	pub swap_memory_total: Option<f32>,
 	/// 交换内存已用(单位: MB)
-	pub swap_memory_used: f32,
+	pub swap_memory_used: Option<f32>,
 	/// 交换内存可用(单位: MB)
-	pub swap_memory_free: f32,
+	pub swap_memory_free: Option<f32>,
 	/// 交换内存使用率
 	pub swap_memory_usage: Option<u8>,
-	/// 内存使用率
-	pub memory_usage: Option<u8>,
 }
 
 #[derive(Debug, Clone)]
@@ -171,7 +173,11 @@ impl SystemInfo {
 		let arch = System::cpu_arch();
 		let os_version = System::os_version().unwrap();
 		let os_type = env::consts::OS.to_string();
-		let boot_time = System::boot_time();
+		let boot_time_secs = System::boot_time();
+		let boot_time = Utc
+			.timestamp_opt(boot_time_secs as i64, 0)
+			.single()
+			.expect("Invalid boot time timestamp");
 		let uptime = System::uptime();
 		HostInfo { host_name: hostname, os_name, arch, os_version, os_type, boot_time, uptime }
 	}
@@ -228,25 +234,16 @@ impl SystemInfo {
 
 		let total_memory = system.total_memory() / 1024 / 1024;
 		let used_memory = system.used_memory() / 1024 / 1024;
-		let free_memory = total_memory - used_memory;
 
 		let swap_memory_total = system.total_swap() / 1024 / 1024;
 		let swap_memory_used = system.used_swap() / 1024 / 1024;
-		let swap_memory_free = swap_memory_total - swap_memory_used;
-
-		let total_memory_f32 = format_float(total_memory as f64, 2);
-		let used_memory_f32 = format_float(used_memory as f64, 2);
-		let free_memory_f32 = format_float(free_memory as f64, 2);
-
-		let swap_memory_usage_f32 = format_float(swap_memory_used as f64, 2);
-		let swap_memory_free_f32 = format_float(swap_memory_free as f64, 2);
-		let swap_memory_total_f32 = format_float(swap_memory_total as f64, 2);
 
 		let memory_usage = if total_memory > 0 {
 			Some(((used_memory as f32 / total_memory as f32) * 100.0) as u8)
 		} else {
 			None
 		};
+
 		let swap_memory_usage = if swap_memory_total > 0 {
 			Some(((swap_memory_used as f32 / swap_memory_total as f32) * 100.0) as u8)
 		} else {
@@ -254,13 +251,25 @@ impl SystemInfo {
 		};
 
 		MemoryInfo {
-			total_memory: total_memory_f32 as f32,
-			used_memory: used_memory_f32 as f32,
-			free_memory: free_memory_f32 as f32,
-			memory_usage,
-			swap_memory_total: swap_memory_total_f32 as f32,
-			swap_memory_used: swap_memory_usage_f32 as f32,
-			swap_memory_free: swap_memory_free_f32 as f32,
+			total: format_float(total_memory as f64, 2) as f32,
+			usage: memory_usage,
+			used_memory: format_float(used_memory as f64, 2) as f32,
+			free_memory: format_float((total_memory - used_memory) as f64, 2) as f32,
+			swap_memory_total: if swap_memory_total > 0 {
+				Some(format_float(swap_memory_total as f64, 2) as f32)
+			} else {
+				None
+			},
+			swap_memory_used: if swap_memory_total > 0 {
+				Some(format_float(swap_memory_used as f64, 2) as f32)
+			} else {
+				None
+			},
+			swap_memory_free: if swap_memory_total > 0 {
+				Some(format_float((swap_memory_total - swap_memory_used) as f64, 2) as f32)
+			} else {
+				None
+			},
 			swap_memory_usage,
 		}
 	}
@@ -467,7 +476,7 @@ impl SystemInfo {
 		});
 
 		let used_memory = match process {
-			Some(process) => process.memory() as f32 / 1024.0 / 1024.0,
+			Some(process) => process.memory() as f64 / 1024.0 / 1024.0,
 			None => 0.0,
 		};
 
@@ -491,11 +500,11 @@ impl SystemInfo {
 				let gpu_total =
 					format_float(info.total_vram() as f64 / (1024.0 * 1024.0), 2) as f32;
 				Some(GpuInfo {
-					gpu_model: gpu.model().to_string(),
-					gpu_memory_used: gpu_usage,
-					gpu_memory_total: gpu_total as f32,
-					gpu_memory_free: gpu_total - gpu_usage,
-					gpu_usage: info.load_pct() as u8,
+					model: gpu.model().to_string(),
+					memory_used: gpu_usage,
+					memory_total: gpu_total,
+					memory_free: gpu_total - gpu_usage,
+					usage: info.load_pct() as u8,
 				})
 			}
 			Err(_) => None,

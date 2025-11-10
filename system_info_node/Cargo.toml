@@ -1,0 +1,28 @@
+[package]
+name = "system_info_node"
+version = "1.6.1"
+authors.workspace = true
+license.workspace = true
+readme.workspace = true
+homepage.workspace = true
+repository.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "3.5.0", features = ["chrono_date", "async"] }
+napi-derive = "3.3.0"
+
+chrono.workspace = true
+system_info = { path = "../system_info_core", features = ["full"], package = "puniyu_system_info"}
+
+
+[build-dependencies]
+napi-build = "=2.3.0"
+
