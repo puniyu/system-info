@@ -1,13 +1,12 @@
 {
   "name": "@puniyu/system-info",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "一个用于获取系统信息库",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "author": "puniyu",
   "repository": "https://github.com/puniyu/system-info",
-
   "license": "MIT",
   "keywords": [
     "napi-rs",
