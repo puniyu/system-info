@@ -1,5 +1,12 @@
 # 变更日志
 
+## [1.1.7](https://github.com/puniyu/system-info/compare/node-v1.1.6...node-v1.1.7) (2025-11-10)
+
+
+### 🎡 持续集成
+
+* **release:** 更新发布工作流中的文件路径 ([40ab1ae](https://github.com/puniyu/system-info/commit/40ab1ae65e564d2b8eac143b37f701e6aeb785c6))
+
 ## [1.1.6](https://github.com/puniyu/system-info/compare/node-v1.1.5...node-v1.1.6) (2025-11-10)
 
 
