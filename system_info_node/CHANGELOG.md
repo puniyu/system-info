@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/puniyu/system-info/compare/node-v1.1.2...node-v1.1.3) (2025-11-10)
+
+
+### 🎡 持续集成
+
+* **workflow:** 为pnpm设置添加名称字段 ([4b6ecf9](https://github.com/puniyu/system-info/commit/4b6ecf99d98aa6c52dcdc09c939e0e96d19e6130))
+
 ## [1.1.2](https://github.com/puniyu/system-info/compare/node-v1.1.1...node-v1.1.2) (2025-11-10)
 
 
