@@ -13,11 +13,6 @@
   "license": "MIT",
   "keywords": [
     "napi-rs",
-    "NAPI",
-    "N-API",
-    "Rust",
-    "node-addon",
-    "node-addon-api",
     "system",
     "system-info"
   ],
