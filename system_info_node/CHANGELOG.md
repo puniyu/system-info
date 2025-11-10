@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/puniyu/system-info/compare/node-v1.1.1...node-v1.1.2) (2025-11-10)
+
+
+### 🎡 持续集成
+
+* **workflow:** 更新应用名称环境变量 ([77f3267](https://github.com/puniyu/system-info/commit/77f32671fe771929f6ae1e1ef338fbb96ff10d94))
+
 ## [1.1.1](https://github.com/puniyu/system-info/compare/node-v1.1.0...node-v1.1.1) (2025-11-10)
 
 
