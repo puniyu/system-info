@@ -37,6 +37,7 @@ jobs:
           manifest-file: .release-please-manifest.json
 
   test:
+    if: "!startsWith(github.head_ref, 'release-please')"
     runs-on: ubuntu-latest
     steps:
       - name: 检出代码
@@ -118,7 +119,8 @@ jobs:
           pattern: system-info-node*
           path: system_info_node/artifacts
 
-      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
+      - name: 设置pnpm
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
         with:
           version: 10.21.0
 
