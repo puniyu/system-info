@@ -200,6 +200,8 @@ impl From<system_info::DiskInfo> for DiskInfo {
 pub struct DiskDetail {
 	/// 磁盘名称
 	pub name: String,
+	/// 磁盘挂载点
+	pub mount: String,
 	/// 总磁盘空间(单位: GB)
 	pub total_space: f64,
 	/// 已用磁盘空间(单位: GB)
@@ -214,6 +216,7 @@ impl From<system_info::DiskDetail> for DiskDetail {
 	fn from(disk_detail: system_info::DiskDetail) -> Self {
 		Self {
 			name: disk_detail.name,
+			mount: disk_detail.mount,
 			total_space: disk_detail.total_space as f64,
 			used_space: disk_detail.used_space as f64,
 			free_space: disk_detail.free_space as f64,

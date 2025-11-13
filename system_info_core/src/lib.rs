@@ -128,6 +128,8 @@ pub struct MemoryInfo {
 pub struct DiskDetail {
 	/// 磁盘名称
 	pub name: String,
+	/// 磁盘挂载点
+	pub mount: String,
 	/// 总磁盘空间(单位: GB)
 	pub total_space: f32,
 	/// 已用磁盘空间(单位: GB)
@@ -302,6 +304,7 @@ impl SystemInfo {
 
 			let disk_detail = DiskDetail {
 				name: disk.name().to_string_lossy().to_string(),
+				mount: disk.mount_point().to_string_lossy().to_string(),
 				total_space: format_float(total_space as f64, 2) as f32,
 				used_space: format_float(used_space as f64, 2) as f32,
 				free_space: format_float(free_space as f64, 2) as f32,
