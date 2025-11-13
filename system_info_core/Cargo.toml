@@ -13,7 +13,7 @@ repository.workspace = true
 sysinfo = { version = "0.37.0" }
 gfxinfo = { version = "0.1.2", optional = true }
 chrono.workspace = true
-hardware-query = "0.2.1"
+num_cpus = "1.17.0"
 
 [features]
 default = ["host", "process", "cpu", "memory","network", "disk"]

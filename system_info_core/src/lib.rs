@@ -114,8 +114,6 @@ pub struct MemoryInfo {
 	pub used: u64,
 	/// 可用内存(单位: MB)
 	pub free: u64,
-	/// 内存速度(单位: Ghz)
-	pub speed: u64,
 	/// 交换内存(单位: MB)
 	pub swap_total: Option<u64>,
 	/// 交换内存已用(单位: MB)
@@ -200,20 +198,21 @@ impl SystemInfo {
 	///
 	#[cfg(feature = "cpu")]
 	pub fn cpu() -> CpuInfo {
-		use hardware_query::CPUInfo;
-		let cpu_info = CPUInfo::query().unwrap();
-		let usage = if cpu_info.core_usage.is_empty() {
-			None
-		} else {
-			Some(cpu_info.core_usage.iter().sum::<f32>() / cpu_info.core_usage.len() as f32)
-		};
+		use std::thread::sleep;
+		use sysinfo::System;
+		let mut system = System::new();
+		system.refresh_cpu_all();
+
+		sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
+		system.refresh_cpu_usage();
+		let cpu = &system.cpus()[0];
 
 		CpuInfo {
-			model_name: cpu_info.model_name.clone(),
-			physical_cores: cpu_info.physical_cores,
-			logical_cores: cpu_info.logical_cores,
-			frequency: ((cpu_info.base_frequency as f32 / 1000.0) * 100.0).round() / 100.0,
-			usage,
+			model_name: cpu.brand().to_string(),
+			physical_cores: num_cpus::get_physical() as u32,
+			logical_cores: num_cpus::get() as u32,
+			frequency: cpu.frequency() as f32 / 1000.0,
+			usage: Some(system.global_cpu_usage().round()),
 		}
 	}
 
@@ -226,12 +225,17 @@ impl SystemInfo {
 	///
 	#[cfg(feature = "memory")]
 	pub fn memory() -> MemoryInfo {
-		let memery_info = hardware_query::MemoryInfo::query().unwrap();
+		use sysinfo::System;
+		let mut system = System::new();
+		system.refresh_memory();
 
-		let total_memory = memery_info.total_mb;
-		let used_memory = memery_info.used_mb;
-		let swap_memory_total = memery_info.swap_total_mb;
-		let swap_memory_used = memery_info.swap_used_mb;
+		let total_memory = system.total_memory() / 1024 / 1024;
+		let used_memory = system.used_memory() / 1024 / 1024;
+		let swap_memory_total = system.total_swap() / 1024 / 1024;
+		let swap_memory_used = system.used_swap() / 1024 / 1024;
+
+		let usage =
+			if total_memory > 0 { (used_memory as f32 / total_memory as f32) * 100.0 } else { 0.0 };
 
 		let swap_memory_usage = if swap_memory_total > 0 {
 			Some((swap_memory_used as f32 / swap_memory_total as f32) * 100.0)
@@ -241,10 +245,9 @@ impl SystemInfo {
 
 		MemoryInfo {
 			total: total_memory,
-			usage: memery_info.usage_percent,
+			usage,
 			used: used_memory,
 			free: total_memory - used_memory,
-			speed: (memery_info.speed_mhz / 1000) as u64,
 			swap_total: if swap_memory_total > 0 { Some(swap_memory_total) } else { None },
 			swap_used: if swap_memory_total > 0 { Some(swap_memory_used) } else { None },
 			swap_free: if swap_memory_total > 0 {
@@ -464,8 +467,14 @@ impl SystemInfo {
 
 		let cpu_usage = process.map(|p| round(p.cpu_usage() as f64) as f32);
 
-		let memory_usage = process
-			.map(|p| round(p.memory() as f64 / (system.total_memory() as f64) * 100.0) as f32);
+		let memory_usage = process.and_then(|p| {
+			let total_memory = system.total_memory();
+			if total_memory > 0 {
+				Some(round(p.memory() as f64 / (total_memory as f64) * 100.0) as f32)
+			} else {
+				None
+			}
+		});
 
 		let used_memory = match process {
 			Some(process) => process.memory() as f64 / 1024.0 / 1024.0,

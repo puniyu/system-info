@@ -147,8 +147,6 @@ pub struct MemoryInfo {
 	pub used: u32,
 	/// 可用内存(单位: MB)
 	pub free: u32,
-	/// 内存速度(单位: Ghz)
-	pub speed: u32,
 	/// 交换内存(单位: MB)
 	pub swap_total: Option<u32>,
 	/// 交换内存已用(单位: MB)
@@ -166,7 +164,6 @@ impl From<system_info::MemoryInfo> for MemoryInfo {
 			usage: memory_info.usage as f64,
 			used: memory_info.used as u32,
 			free: memory_info.free as u32,
-			speed: memory_info.speed as u32,
 			swap_total: memory_info.swap_total.map(|d| d as u32),
 			swap_used: memory_info.swap_used.map(|d| d as u32),
 			swap_free: memory_info.swap_free.map(|d| d as u32),

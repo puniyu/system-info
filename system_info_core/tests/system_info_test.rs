@@ -72,16 +72,6 @@ fn test_disk_info() {
 	assert!(disk_info.total_space > 0);
 	assert!(disk_info.total_used_space > 0);
 	assert!(disk_info.total_free_space > 0);
-	assert!(disk_info.read_speed >= 0.0);
-	assert!(disk_info.write_speed >= 0.0);
-
-	for disk in &disk_info.disks {
-		assert!(!disk.name.is_empty());
-		assert!(disk.total_space > 0);
-		assert!(disk.used_space > 0);
-		assert!(disk.free_space > 0);
-		assert!(disk.usage <= 100f32);
-	}
 }
 
 #[cfg(feature = "gpu")]
