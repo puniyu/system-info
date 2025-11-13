@@ -1,10 +1,9 @@
-use chrono::{DateTime, TimeZone, Utc};
-#[cfg(feature = "gpu")]
-use gfxinfo::active_gpu;
-use rust_decimal::{
-	Decimal,
-	prelude::{FromPrimitive, ToPrimitive},
-};
+#[cfg(feature = "host")]
+use chrono::Utc;
+#[cfg(feature = "process")]
+use chrono::{DateTime, TimeZone};
+#[cfg(feature = "process")]
+use std::time::{SystemTime, UNIX_EPOCH};
 #[cfg(feature = "process")]
 pub use sysinfo::Pid;
 #[cfg(feature = "network")]
@@ -68,23 +67,25 @@ pub struct ProcessInfo {
 	/// 进程运行时间，单位：秒
 	pub run_time: u64,
 	/// 进程CPU使用率
-	pub cpu_usage: Option<u8>,
+	pub cpu_usage: Option<f32>,
 	/// 进程内存使用率
-	pub memory_usage: Option<u8>,
+	pub memory_usage: Option<f32>,
 	/// 进程已用内存(单位: MB)
 	pub used_memory: f64,
 }
 #[derive(Debug, Clone)]
 #[cfg(feature = "cpu")]
 pub struct CpuInfo {
-	/// CPU型号
-	pub cpu_model: String,
+	/// CPU名称
+	pub model_name: String,
 	/// CPU核心数
-	pub cpu_cores: usize,
-	/// CPU频率(单位: GHz)
-	pub cpu_frequency: Option<f32>,
+	pub physical_cores: u32,
+	/// CPU 线程数
+	pub logical_cores: u32,
+	/// CPU基本频率(单位: GHz)
+	pub frequency: f32,
 	/// CPU使用率
-	pub cpu_usage: Option<u8>,
+	pub usage: Option<f32>,
 }
 
 #[derive(Debug, Clone)]
@@ -106,21 +107,23 @@ pub struct GpuInfo {
 #[cfg(feature = "memory")]
 pub struct MemoryInfo {
 	/// 总内存(单位: MB)
-	pub total: f32,
+	pub total: u64,
 	/// 内存使用率
-	pub usage: Option<u8>,
+	pub usage: f32,
 	/// 已用内存(单位: MB)
-	pub used_memory: f32,
+	pub used: u64,
 	/// 可用内存(单位: MB)
-	pub free_memory: f32,
+	pub free: u64,
+	/// 内存速度(单位: Ghz)
+	pub speed: u64,
 	/// 交换内存(单位: MB)
-	pub swap_memory_total: Option<f32>,
+	pub swap_total: Option<u64>,
 	/// 交换内存已用(单位: MB)
-	pub swap_memory_used: Option<f32>,
+	pub swap_used: Option<u64>,
 	/// 交换内存可用(单位: MB)
-	pub swap_memory_free: Option<f32>,
+	pub swap_free: Option<u64>,
 	/// 交换内存使用率
-	pub swap_memory_usage: Option<u8>,
+	pub swap_usage: Option<f32>,
 }
 
 #[derive(Debug, Clone)]
@@ -131,11 +134,11 @@ pub struct DiskDetail {
 	/// 磁盘挂载点
 	pub mount: String,
 	/// 总磁盘空间(单位: GB)
-	pub total_space: f32,
+	pub total_space: u64,
 	/// 已用磁盘空间(单位: GB)
-	pub used_space: f32,
+	pub used_space: u64,
 	/// 可用磁盘空间(单位: GB)
-	pub free_space: f32,
+	pub free_space: u64,
 	/// 磁盘使用率
 	pub usage: f32,
 }
@@ -144,13 +147,17 @@ pub struct DiskDetail {
 #[cfg(feature = "disk")]
 pub struct DiskInfo {
 	/// 总磁盘空间(单位: GB)
-	pub total_disk_space: f32,
+	pub total_space: u64,
 	/// 总已用磁盘空间(单位: GB)
-	pub total_used_space: f32,
+	pub total_used_space: u64,
 	/// 总可用磁盘空间(单位: GB)
-	pub total_free_space: f32,
+	pub total_free_space: u64,
 	/// 总体磁盘使用率
-	pub total_usage: f32,
+	pub total_usage: f64,
+	/// 磁盘读速度(单位: KB/S)
+	pub read_speed: f32,
+	/// 磁盘写入速度(单位: KB/S)
+	pub write_speed: f32,
 	/// 各个磁盘详细信息
 	pub disks: Vec<DiskDetail>,
 }
@@ -193,31 +200,21 @@ impl SystemInfo {
 	///
 	#[cfg(feature = "cpu")]
 	pub fn cpu() -> CpuInfo {
-		use std::thread::sleep;
-		use sysinfo::System;
-		let mut system = System::new();
-		system.refresh_cpu_all();
-
-		sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
-		system.refresh_cpu_usage();
-
-		let cpus = system.cpus();
-
-		let cpu_usage = if !cpus.is_empty() {
-			let usage = cpus.iter().map(|cpu| cpu.cpu_usage()).sum::<f32>() / cpus.len() as f32;
-			Some(usage.round() as u8)
-		} else {
+		use hardware_query::CPUInfo;
+		let cpu_info = CPUInfo::query().unwrap();
+		let usage = if cpu_info.core_usage.is_empty() {
 			None
+		} else {
+			Some(cpu_info.core_usage.iter().sum::<f32>() / cpu_info.core_usage.len() as f32)
 		};
 
-		let cpu_cores = cpus.len();
-
-		let cpu_model =
-			if !cpus.is_empty() { cpus[0].brand().to_string() } else { "Unknown".to_string() };
-
-		let cpu_frequency = if !cpus.is_empty() { Some(cpus[0].frequency() as f32) } else { None };
-
-		CpuInfo { cpu_usage, cpu_frequency, cpu_cores, cpu_model }
+		CpuInfo {
+			model_name: cpu_info.model_name.clone(),
+			physical_cores: num_cpus::get_physical() as u32,
+			logical_cores: num_cpus::get() as u32,
+			frequency: ((cpu_info.base_frequency as f32 / 1000.0) * 100.0).round() / 100.0,
+			usage,
+		}
 	}
 
 	/// 获取内存信息
@@ -228,51 +225,34 @@ impl SystemInfo {
 	/// * [MemoryInfo] - 内存信息
 	///
 	#[cfg(feature = "memory")]
-	#[inline]
 	pub fn memory() -> MemoryInfo {
-		use sysinfo::System;
-		let mut system = System::new();
-		system.refresh_memory();
+		let memery_info = hardware_query::MemoryInfo::query().unwrap();
 
-		let total_memory = system.total_memory() / 1024 / 1024;
-		let used_memory = system.used_memory() / 1024 / 1024;
-
-		let swap_memory_total = system.total_swap() / 1024 / 1024;
-		let swap_memory_used = system.used_swap() / 1024 / 1024;
-
-		let memory_usage = if total_memory > 0 {
-			Some(((used_memory as f32 / total_memory as f32) * 100.0) as u8)
-		} else {
-			None
-		};
+		let total_memory = memery_info.total_mb;
+		let used_memory = memery_info.used_mb;
+		let swap_memory_total = memery_info.swap_total_mb;
+		let swap_memory_used = memery_info.swap_used_mb;
 
 		let swap_memory_usage = if swap_memory_total > 0 {
-			Some(((swap_memory_used as f32 / swap_memory_total as f32) * 100.0) as u8)
+			Some((swap_memory_used as f32 / swap_memory_total as f32) * 100.0)
 		} else {
 			None
 		};
 
 		MemoryInfo {
-			total: format_float(total_memory as f64, 2) as f32,
-			usage: memory_usage,
-			used_memory: format_float(used_memory as f64, 2) as f32,
-			free_memory: format_float((total_memory - used_memory) as f64, 2) as f32,
-			swap_memory_total: if swap_memory_total > 0 {
-				Some(format_float(swap_memory_total as f64, 2) as f32)
+			total: total_memory,
+			usage: memery_info.usage_percent,
+			used: used_memory,
+			free: total_memory - used_memory,
+			speed: (memery_info.speed_mhz / 1000) as u64,
+			swap_total: if swap_memory_total > 0 { Some(swap_memory_total) } else { None },
+			swap_used: if swap_memory_total > 0 { Some(swap_memory_used) } else { None },
+			swap_free: if swap_memory_total > 0 {
+				Some(swap_memory_total - swap_memory_used)
 			} else {
 				None
 			},
-			swap_memory_used: if swap_memory_total > 0 {
-				Some(format_float(swap_memory_used as f64, 2) as f32)
-			} else {
-				None
-			},
-			swap_memory_free: if swap_memory_total > 0 {
-				Some(format_float((swap_memory_total - swap_memory_used) as f64, 2) as f32)
-			} else {
-				None
-			},
-			swap_memory_usage,
+			swap_usage: swap_memory_usage,
 		}
 	}
 
@@ -284,31 +264,41 @@ impl SystemInfo {
 	/// * [DiskInfo] - 磁盘信息
 	///
 	#[cfg(feature = "disk")]
-	#[inline]
 	pub fn disk() -> DiskInfo {
-		use sysinfo::Disks;
+		use sysinfo::{Disks, ProcessesToUpdate, System};
+		let mut s = System::new_all();
+		s.refresh_processes(ProcessesToUpdate::All, true);
+
+		let mut read_speed = 0f32;
+		let mut write_speed = 0f32;
+		for process in s.processes() {
+			let disk_usage = process.1.disk_usage();
+			read_speed += disk_usage.read_bytes as f32 / 1024.0;
+			write_speed += disk_usage.written_bytes as f32 / 1024.0;
+		}
+
 		let disks = Disks::new_with_refreshed_list();
 
-		let mut total_disk_space = 0f32;
-		let mut total_used_space = 0f32;
-		let mut total_free_space = 0f32;
+		let mut total_disk_space = 0u64;
+		let mut total_used_space = 0u64;
+		let mut total_free_space = 0u64;
 		let mut disk_details = Vec::new();
 
 		for disk in disks.list() {
-			let total_space = disk.total_space() as f32 / (1024.0 * 1024.0 * 1024.0);
-			let free_space = disk.available_space() as f32 / (1024.0 * 1024.0 * 1024.0);
+			let total_space = disk.total_space() / (1024 * 1024 * 1024);
+			let free_space = disk.available_space() / (1024 * 1024 * 1024);
 			let used_space = total_space - free_space;
 
 			let usage =
-				if disk.total_space() > 0 { (used_space / total_space) * 100.0 } else { 0.0 };
+				if total_space > 0 { (used_space / total_space) as f64 * 100.0 } else { 0.0 };
 
 			let disk_detail = DiskDetail {
 				name: disk.name().to_string_lossy().to_string(),
-				mount: disk.mount_point().to_string_lossy().to_string(),
-				total_space: format_float(total_space as f64, 2) as f32,
-				used_space: format_float(used_space as f64, 2) as f32,
-				free_space: format_float(free_space as f64, 2) as f32,
-				usage: format_float(usage as f64, 2) as f32,
+				mount: disk.mount_point().to_string_lossy().trim_end_matches('\\').to_string(),
+				total_space,
+				used_space,
+				free_space,
+				usage: usage.round() as f32,
 			};
 
 			total_disk_space += total_space;
@@ -317,17 +307,19 @@ impl SystemInfo {
 			disk_details.push(disk_detail);
 		}
 
-		let total_usage = if total_disk_space > 0.0 {
-			(total_used_space / total_disk_space) * 100.0
+		let total_usage = if total_disk_space > 0 {
+			(total_used_space / total_disk_space) as f64 * 100.0
 		} else {
 			0.0
 		};
 
 		DiskInfo {
-			total_disk_space: format_float(total_disk_space as f64, 2) as f32,
-			total_used_space: format_float(total_used_space as f64, 2) as f32,
-			total_free_space: format_float(total_free_space as f64, 2) as f32,
-			total_usage: format_float(total_usage as f64, 2) as f32,
+			total_space: total_disk_space,
+			total_used_space,
+			total_free_space,
+			total_usage,
+			read_speed: read_speed.round(),
+			write_speed: write_speed.round(),
 			disks: disk_details,
 		}
 	}
@@ -353,8 +345,8 @@ impl SystemInfo {
 			network_infos.push(NetworkInfo {
 				name: network.to_string(),
 				mac_addr: data.mac_address(),
-				upload: format_float((data.total_received() as f32 / 1024.0) as f64, 2),
-				download: format_float((data.total_transmitted() as f32 / 1024.0) as f64, 2),
+				upload: round((data.total_received() as f32 / 1024.0) as f64),
+				download: round((data.total_transmitted() as f32 / 1024.0) as f64),
 				ip_info: ip_info_list,
 			});
 		}
@@ -408,8 +400,8 @@ impl SystemInfo {
 				return NetworkInfo {
 					name: network_name.to_string(),
 					mac_addr: data.mac_address(),
-					upload: format_float(data.received() as f64 / 1024.0, 2),
-					download: format_float(data.transmitted() as f64 / 1024.0, 2),
+					upload: round(data.received() as f64 / 1024.0),
+					download: round(data.transmitted() as f64 / 1024.0),
 					ip_info: ip_info_list,
 				};
 			}
@@ -464,19 +456,16 @@ impl SystemInfo {
 			"Unknown".to_string()
 		};
 		let start_time = process.map(|p| p.start_time()).unwrap_or(0);
-		let run_time = process
-			.map(|p| {
-				let current_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-				let process_start_time = p.start_time();
-				current_time.saturating_sub(process_start_time)
-			})
-			.unwrap_or(0);
+		let run_time = {
+			let current_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+			let process_start_time = process.map(|p| p.start_time()).unwrap_or(0);
+			current_time.saturating_sub(process_start_time)
+		};
 
-		let cpu_usage = process.map(|p| format_float(p.cpu_usage() as f64, 2) as u8);
+		let cpu_usage = process.map(|p| round(p.cpu_usage() as f64) as f32);
 
-		let memory_usage = process.map(|p| {
-			format_float(p.memory() as f64 / (system.total_memory() as f64) * 100.0, 2) as u8
-		});
+		let memory_usage = process
+			.map(|p| round(p.memory() as f64 / (system.total_memory() as f64) * 100.0) as f32);
 
 		let used_memory = match process {
 			Some(process) => process.memory() as f64 / 1024.0 / 1024.0,
@@ -484,6 +473,47 @@ impl SystemInfo {
 		};
 
 		ProcessInfo { pid, name, start_time, run_time, cpu_usage, memory_usage, used_memory }
+	}
+
+	#[cfg(feature = "process")]
+	pub fn process_all() -> Vec<ProcessInfo> {
+		use sysinfo::{ProcessesToUpdate, System};
+		let mut system = System::new();
+		system.refresh_processes(ProcessesToUpdate::All, true);
+		let total_memory = system.total_memory();
+		system
+			.processes()
+			.values()
+			.map(|process| {
+				let cpu_usage = {
+					let usage = process.cpu_usage();
+					if usage > 0.0 { Some(usage.round()) } else { None }
+				};
+				let used_memory = process.memory() as f64 / 1024.0 / 1024.0;
+				let memory_usage = if total_memory > 0 {
+					Some((process.memory() as f32 / total_memory as f32 * 100.0).round())
+				} else {
+					None
+				};
+
+				let run_time = {
+					let current_time =
+						SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+					let process_start_time = process.start_time();
+					current_time.saturating_sub(process_start_time)
+				};
+
+				ProcessInfo {
+					pid: process.pid(),
+					name: process.name().to_string_lossy().to_string(),
+					start_time: process.start_time(),
+					run_time,
+					cpu_usage,
+					memory_usage,
+					used_memory,
+				}
+			})
+			.collect()
 	}
 
 	/// 获取GPU信息
@@ -495,13 +525,13 @@ impl SystemInfo {
 	///
 	#[cfg(feature = "gpu")]
 	pub fn gpu() -> Option<GpuInfo> {
+		use gfxinfo::active_gpu;
 		let gpu = active_gpu();
 		match gpu {
 			Ok(gpu) => {
 				let info = gpu.info();
-				let gpu_usage = format_float(info.used_vram() as f64 / (1024.0 * 1024.0), 2) as f32;
-				let gpu_total =
-					format_float(info.total_vram() as f64 / (1024.0 * 1024.0), 2) as f32;
+				let gpu_usage = round(info.used_vram() as f64 / (1024.0 * 1024.0)) as f32;
+				let gpu_total = round(info.total_vram() as f64 / (1024.0 * 1024.0)) as f32;
 				Some(GpuInfo {
 					model: gpu.model().to_string(),
 					memory_used: gpu_usage,
@@ -515,8 +545,6 @@ impl SystemInfo {
 	}
 }
 
-fn format_float(value: f64, decimals: u32) -> f64 {
-	let decimal_value = Decimal::from_f64(value).unwrap_or(Decimal::ZERO);
-	let rounded = decimal_value.round_dp(decimals);
-	rounded.to_f64().unwrap_or(0.0)
+fn round(value: f64) -> f64 {
+	(value * 100.0).round() / 100.0
 }

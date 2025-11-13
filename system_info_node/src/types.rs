@@ -88,9 +88,9 @@ pub struct ProcessInfo {
 	/// 进程运行时间，单位：秒
 	pub run_time: u32,
 	/// 进程CPU使用率
-	pub cpu_usage: Option<u8>,
+	pub cpu_usage: Option<f64>,
 	/// 进程内存使用率
-	pub memory_usage: Option<u8>,
+	pub memory_usage: Option<f64>,
 	/// 进程已用内存(单位: MB)
 	pub used_memory: f64,
 }
@@ -102,8 +102,8 @@ impl From<system_info::ProcessInfo> for ProcessInfo {
 			name: process_info.name,
 			start_time: process_info.start_time as u32,
 			run_time: process_info.run_time as u32,
-			cpu_usage: process_info.cpu_usage,
-			memory_usage: process_info.memory_usage,
+			cpu_usage: process_info.cpu_usage.map(|d| d as f64),
+			memory_usage: process_info.memory_usage.map(|d| d as f64),
 			used_memory: process_info.used_memory,
 		}
 	}
@@ -112,23 +112,26 @@ impl From<system_info::ProcessInfo> for ProcessInfo {
 #[derive(Debug, Clone)]
 #[napi(object)]
 pub struct CpuInfo {
-	/// CPU型号
-	pub cpu_model: String,
+	/// CPU名称
+	pub model_name: String,
 	/// CPU核心数
-	pub cpu_cores: u32,
-	/// CPU频率(单位: GHz)
-	pub cpu_frequency: Option<f64>,
+	pub physical_cores: u32,
+	/// CPU 线程数
+	pub logical_cores: u32,
+	/// CPU基本频率(单位: GHz)
+	pub frequency: f64,
 	/// CPU使用率
-	pub cpu_usage: Option<u8>,
+	pub usage: Option<f64>,
 }
 
 impl From<system_info::CpuInfo> for CpuInfo {
 	fn from(cpu_info: system_info::CpuInfo) -> Self {
 		Self {
-			cpu_model: cpu_info.cpu_model,
-			cpu_cores: cpu_info.cpu_cores as u32,
-			cpu_frequency: cpu_info.cpu_frequency.map(|d| d as f64),
-			cpu_usage: cpu_info.cpu_usage,
+			model_name: cpu_info.model_name,
+			physical_cores: cpu_info.physical_cores,
+			logical_cores: cpu_info.logical_cores,
+			frequency: cpu_info.frequency as f64,
+			usage: cpu_info.usage.map(|d| d as f64),
 		}
 	}
 }
@@ -137,34 +140,37 @@ impl From<system_info::CpuInfo> for CpuInfo {
 #[napi(object)]
 pub struct MemoryInfo {
 	/// 总内存(单位: MB)
-	pub total: f64,
+	pub total: u32,
 	/// 内存使用率
-	pub usage: Option<u32>,
+	pub usage: f64,
 	/// 已用内存(单位: MB)
-	pub used_memory: f64,
+	pub used: u32,
 	/// 可用内存(单位: MB)
-	pub free_memory: f64,
+	pub free: u32,
+	/// 内存速度(单位: Ghz)
+	pub speed: u32,
 	/// 交换内存(单位: MB)
-	pub swap_memory_total: Option<f64>,
+	pub swap_total: Option<u32>,
 	/// 交换内存已用(单位: MB)
-	pub swap_memory_used: Option<f64>,
+	pub swap_used: Option<u32>,
 	/// 交换内存可用(单位: MB)
-	pub swap_memory_free: Option<f64>,
+	pub swap_free: Option<u32>,
 	/// 交换内存使用率
-	pub swap_memory_usage: Option<u32>,
+	pub swap_usage: Option<f64>,
 }
 
 impl From<system_info::MemoryInfo> for MemoryInfo {
 	fn from(memory_info: system_info::MemoryInfo) -> Self {
 		Self {
-			total: memory_info.total as f64,
-			usage: memory_info.usage.map(|d| d as u32),
-			used_memory: memory_info.used_memory as f64,
-			free_memory: memory_info.free_memory as f64,
-			swap_memory_total: memory_info.swap_memory_total.map(|d| d as f64),
-			swap_memory_used: memory_info.swap_memory_used.map(|d| d as f64),
-			swap_memory_free: memory_info.swap_memory_free.map(|d| d as f64),
-			swap_memory_usage: memory_info.swap_memory_usage.map(|d| d as u32),
+			total: memory_info.total as u32,
+			usage: memory_info.usage as f64,
+			used: memory_info.used as u32,
+			free: memory_info.free as u32,
+			speed: memory_info.speed as u32,
+			swap_total: memory_info.swap_total.map(|d| d as u32),
+			swap_used: memory_info.swap_used.map(|d| d as u32),
+			swap_free: memory_info.swap_free.map(|d| d as u32),
+			swap_usage: memory_info.swap_usage.map(|d| d as f64),
 		}
 	}
 }
@@ -173,13 +179,17 @@ impl From<system_info::MemoryInfo> for MemoryInfo {
 #[napi(object)]
 pub struct DiskInfo {
 	/// 总磁盘空间(单位: GB)
-	pub total_disk_space: f64,
+	pub total_space: u32,
 	/// 总已用磁盘空间(单位: GB)
-	pub total_used_space: f64,
+	pub total_used_space: u32,
 	/// 总可用磁盘空间(单位: GB)
-	pub total_free_space: f64,
+	pub total_free_space: u32,
 	/// 总体磁盘使用率
 	pub total_usage: f64,
+	/// 磁盘读速度(单位: MB/S)
+	pub read_speed: f64,
+	/// 磁盘写入速度(单位: MB/S)
+	pub write_speed: f64,
 	/// 各个磁盘详细信息
 	pub disks: Vec<DiskDetail>,
 }
@@ -187,10 +197,12 @@ pub struct DiskInfo {
 impl From<system_info::DiskInfo> for DiskInfo {
 	fn from(disk_info: system_info::DiskInfo) -> Self {
 		Self {
-			total_disk_space: disk_info.total_disk_space as f64,
-			total_used_space: disk_info.total_used_space as f64,
-			total_free_space: disk_info.total_free_space as f64,
-			total_usage: disk_info.total_usage as f64,
+			total_space: disk_info.total_space as u32,
+			total_used_space: disk_info.total_used_space as u32,
+			total_free_space: disk_info.total_free_space as u32,
+			total_usage: disk_info.total_usage,
+			read_speed: disk_info.read_speed as f64,
+			write_speed: disk_info.write_speed as f64,
 			disks: disk_info.disks.into_iter().map(|d| d.into()).collect(),
 		}
 	}
@@ -203,11 +215,11 @@ pub struct DiskDetail {
 	/// 磁盘挂载点
 	pub mount: String,
 	/// 总磁盘空间(单位: GB)
-	pub total_space: f64,
+	pub total_space: u32,
 	/// 已用磁盘空间(单位: GB)
-	pub used_space: f64,
+	pub used_space: u32,
 	/// 可用磁盘空间(单位: GB)
-	pub free_space: f64,
+	pub free_space: u32,
 	/// 磁盘使用率
 	pub usage: f64,
 }
@@ -217,9 +229,9 @@ impl From<system_info::DiskDetail> for DiskDetail {
 		Self {
 			name: disk_detail.name,
 			mount: disk_detail.mount,
-			total_space: disk_detail.total_space as f64,
-			used_space: disk_detail.used_space as f64,
-			free_space: disk_detail.free_space as f64,
+			total_space: disk_detail.total_space as u32,
+			used_space: disk_detail.used_space as u32,
+			free_space: disk_detail.free_space as u32,
 			usage: disk_detail.usage as f64,
 		}
 	}

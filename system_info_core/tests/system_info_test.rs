@@ -17,15 +17,14 @@ fn test_host_info() {
 fn test_cpu_info() {
 	let cpu_info = SystemInfo::cpu();
 
-	assert!(!cpu_info.cpu_model.is_empty());
-	assert!(cpu_info.cpu_cores > 0);
+	assert!(!cpu_info.model_name.is_empty());
+	assert!(cpu_info.physical_cores > 0);
+	assert!(cpu_info.logical_cores > 0);
 
-	if let Some(frequency) = cpu_info.cpu_frequency {
-		assert!(frequency > 0.0);
-	}
+	assert!(cpu_info.frequency >= 0.0);
 
-	if let Some(usage) = cpu_info.cpu_usage {
-		assert!(usage <= 100);
+	if let Some(usage) = cpu_info.usage {
+		assert!(usage <= 100.0);
 	}
 }
 
@@ -46,11 +45,11 @@ fn test_process_info() {
 	assert!(process_info.used_memory >= 0.0);
 
 	if let Some(cpu_usage) = process_info.cpu_usage {
-		assert!(cpu_usage <= 100);
+		assert!(cpu_usage <= 100.0);
 	}
 
 	if let Some(memory_usage) = process_info.memory_usage {
-		assert!(memory_usage <= 100);
+		assert!(memory_usage <= 100.0);
 	}
 }
 
@@ -59,19 +58,10 @@ fn test_process_info() {
 fn test_memory_info() {
 	let memory_info = SystemInfo::memory();
 
-	println!("内存信息: {:#?}", memory_info);
-
-	assert!(memory_info.total > 0.0);
-	assert!(memory_info.used_memory >= 0.0);
-	assert!(memory_info.free_memory >= 0.0);
-
-	println!("总内存: {} MB", memory_info.total);
-	println!("已用内存: {} MB", memory_info.used_memory);
-	println!("可用内存: {} MB", memory_info.free_memory);
-
-	if let Some(usage) = memory_info.usage {
-		println!("内存使用率: {}%", usage);
-	}
+	assert!(memory_info.total > 0);
+	assert!(memory_info.used > 0);
+	assert!(memory_info.free > 0);
+	assert!(memory_info.usage >= 0.0);
 }
 
 #[cfg(feature = "disk")]
@@ -79,24 +69,18 @@ fn test_memory_info() {
 fn test_disk_info() {
 	let disk_info = SystemInfo::disk();
 
-	println!("硬盘信息: {:#?}", disk_info);
-
-	assert!(disk_info.total_disk_space > 0.0);
-	assert!(disk_info.total_used_space >= 0.0);
-	assert!(disk_info.total_free_space >= 0.0);
-
-	println!("总磁盘空间: {} GB", disk_info.total_disk_space);
-	println!("已用磁盘空间: {} GB", disk_info.total_used_space);
-	println!("可用磁盘空间: {} GB", disk_info.total_free_space);
-	println!("磁盘使用率: {}%", disk_info.total_usage);
+	assert!(disk_info.total_space > 0);
+	assert!(disk_info.total_used_space > 0);
+	assert!(disk_info.total_free_space > 0);
+	assert!(disk_info.read_speed >= 0.0);
+	assert!(disk_info.write_speed >= 0.0);
 
 	for disk in &disk_info.disks {
 		assert!(!disk.name.is_empty());
-		println!("  磁盘名称: {}", disk.name);
-		println!("  总空间: {} GB", disk.total_space);
-		println!("  已用空间: {} GB", disk.used_space);
-		println!("  可用空间: {} GB", disk.free_space);
-		println!("  使用率: {}%", disk.usage);
+		assert!(disk.total_space > 0);
+		assert!(disk.used_space > 0);
+		assert!(disk.free_space > 0);
+		assert!(disk.usage <= 100f32);
 	}
 }
 
