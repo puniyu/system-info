@@ -1,5 +1,17 @@
 # 变更日志
 
+## [1.2.0](https://github.com/puniyu/system-info/compare/node-v1.1.7...node-v1.2.0) (2025-11-13)
+
+
+### ✨ 新功能
+
+* **system_info:** 添加磁盘挂载点信息 ([e06ddc2](https://github.com/puniyu/system-info/commit/e06ddc22d1ed97d4776f5490ac270b53082b5fe1))
+
+
+### 🔧 其他更新
+
+* **deps:** update pnpm to v10.22.0 ([edb9520](https://github.com/puniyu/system-info/commit/edb9520700d60c0cf7e489f1f8519d51a0e39b8a))
+
 ## [1.1.7](https://github.com/puniyu/system-info/compare/node-v1.1.6...node-v1.1.7) (2025-11-10)
 
 
