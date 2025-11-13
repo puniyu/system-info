@@ -292,8 +292,11 @@ impl SystemInfo {
 			let free_space = disk.available_space() / (1024 * 1024 * 1024);
 			let used_space = total_space - free_space;
 
-			let usage =
-				if total_space > 0 { (used_space / total_space) as f64 * 100.0 } else { 0.0 };
+			let usage = if total_space > 0 {
+				(used_space as f64 / total_space as f64) * 100.0
+			} else {
+				0.0
+			};
 
 			let disk_detail = DiskDetail {
 				name: disk.name().to_string_lossy().to_string(),

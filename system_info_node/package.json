@@ -6,7 +6,10 @@
   "types": "dist/index.d.ts",
   "type": "module",
   "author": "puniyu",
-  "repository": "https://github.com/puniyu/system-info",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/puniyu/system-info.git"
+  },
   "license": "MIT",
   "keywords": [
     "NAPI",
