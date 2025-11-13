@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.2](https://github.com/puniyu/system-info/compare/core-v0.8.1...core-v0.8.2) (2025-11-13)
+
+
+### 🐛 错误修复
+
+* **system_info_core:** 修复磁盘使用率计算精度问题 ([39fd5ac](https://github.com/puniyu/system-info/commit/39fd5aca68721a0ceedc137a7173a2a1453b36c7))
+
 ## [0.8.1](https://github.com/puniyu/system-info/compare/core-v0.8.0...core-v0.8.1) (2025-11-13)
 
 
