@@ -210,8 +210,8 @@ impl SystemInfo {
 
 		CpuInfo {
 			model_name: cpu_info.model_name.clone(),
-			physical_cores: num_cpus::get_physical() as u32,
-			logical_cores: num_cpus::get() as u32,
+			physical_cores: cpu_info.physical_cores,
+			logical_cores: cpu_info.logical_cores,
 			frequency: ((cpu_info.base_frequency as f32 / 1000.0) * 100.0).round() / 100.0,
 			usage,
 		}
