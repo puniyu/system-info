@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.8.1](https://github.com/puniyu/system-info/compare/core-v0.8.0...core-v0.8.1) (2025-11-13)
+
+
+### ♻️ 代码重构
+
+* **cpu:** 移除对 num_cpus crate 的依赖 ([71cd214](https://github.com/puniyu/system-info/commit/71cd21451db6dcc3cdad30644d858841fecc78d6))
+* **cpu:** 重构CPU信息获取逻辑以提高准确性 ([f5f08a9](https://github.com/puniyu/system-info/commit/f5f08a9eefcb2d90d4cce88f7723579e33f2d686))
+* **system_info:** 重构系统信息数据结构和实现 ([3b67b05](https://github.com/puniyu/system-info/commit/3b67b05563f94d945d760e5c226cf6571eb25925))
+
 ## [0.8.0](https://github.com/puniyu/system-info/compare/core-v0.7.0...core-v0.8.0) (2025-11-13)
 
 

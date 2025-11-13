@@ -1,6 +1,6 @@
 [package]
 name = "system_info_node"
-version = "1.2.0"
+version = "1.2.1"
 authors.workspace = true
 license.workspace = true
 readme.workspace = true
