@@ -1,5 +1,12 @@
 # 变更日志
 
+## [1.2.3](https://github.com/puniyu/system-info/compare/node-v1.2.2...node-v1.2.3) (2025-11-14)
+
+
+### ♻️ 代码重构
+
+* **ci:** 移除冗余的 apt 包安装步骤 ([987654d](https://github.com/puniyu/system-info/commit/987654d4d74eb19ea20ee81601110cc0ec9ac212))
+
 ## [1.2.2](https://github.com/puniyu/system-info/compare/node-v1.2.1...node-v1.2.2) (2025-11-13)
 
 
