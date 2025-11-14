@@ -25,3 +25,8 @@ incremental = false
 [profile.dev]
 incremental = true
 
+[patch.crates-io.libdrm_amdgpu_sys]
+git = "https://github.com/Umio-Yasuno/libdrm-amdgpu-sys-rs"
+default-features = false
+features = ["dynamic_loading"]
+

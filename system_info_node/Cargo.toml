@@ -16,10 +16,11 @@ publish = false
 crate-type = ["cdylib"]
 
 [dependencies]
+chrono.workspace = true
+
 napi = { version = "3.5.0", features = ["chrono_date", "async"] }
 napi-derive = "3.3.0"
 
-chrono.workspace = true
 system_info = { path = "../system_info_core", features = ["full"], package = "puniyu_system_info"}
 
 

@@ -324,8 +324,7 @@ checksum = "6a82ae493e598baaea5209805c49bbf2ea7de956d50d7da0da1164f9c6d28543"
 [[package]]
 name = "libdrm_amdgpu_sys"
 version = "0.8.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a7bf95f3c5d8a8ae4a5c0c46fe2271c16fdf8fd4b26978f44b082a0f8ebaaae"
+source = "git+https://github.com/Umio-Yasuno/libdrm-amdgpu-sys-rs#7243e32a33e370dc3b22846260ea436c7e67c878"
 dependencies = [
  "libc",
 ]
@@ -535,7 +534,7 @@ dependencies = [
 
 [[package]]
 name = "puniyu_system_info"
-version = "0.8.1"
+version = "0.8.2"
 dependencies = [
  "chrono",
  "gfxinfo",
@@ -641,7 +640,7 @@ dependencies = [
 
 [[package]]
 name = "system_info_node"
-version = "1.2.1"
+version = "1.2.2"
 dependencies = [
  "chrono",
  "napi",
