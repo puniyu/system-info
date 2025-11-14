@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.3](https://github.com/puniyu/system-info/compare/core-v0.8.2...core-v0.8.3) (2025-11-14)
+
+
+### 🐛 错误修复
+
+* **system_info_core:** 限制GPU信息获取仅支持Windows系统 ([ceeb138](https://github.com/puniyu/system-info/commit/ceeb138a253b74ae28da56bdf0bb4fc651266d7e))
+
 ## [0.8.2](https://github.com/puniyu/system-info/compare/core-v0.8.1...core-v0.8.2) (2025-11-13)
 
 
