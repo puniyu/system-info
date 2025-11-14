@@ -531,28 +531,38 @@ impl SystemInfo {
 	/// 获取GPU信息
 	///
 	/// 此函数可以获取GPU信息，包括型号、已用内存、总内存、可用内存、使用率等
+	///
+	/// 暂时只支持 Windows
 	/// # 返回值
 	///
 	/// * [GpuInfo] - GPU信息
 	///
 	#[cfg(feature = "gpu")]
 	pub fn gpu() -> Option<GpuInfo> {
-		use gfxinfo::active_gpu;
-		let gpu = active_gpu();
-		match gpu {
-			Ok(gpu) => {
-				let info = gpu.info();
-				let gpu_usage = round(info.used_vram() as f64 / (1024.0 * 1024.0)) as f32;
-				let gpu_total = round(info.total_vram() as f64 / (1024.0 * 1024.0)) as f32;
-				Some(GpuInfo {
-					model: gpu.model().to_string(),
-					memory_used: gpu_usage,
-					memory_total: gpu_total,
-					memory_free: gpu_total - gpu_usage,
-					usage: info.load_pct() as u8,
-				})
+		#[cfg(not(target_os = "windows"))]
+		{
+			return None;
+		}
+
+		#[cfg(target_os = "windows")]
+		{
+			use gfxinfo::active_gpu;
+			let gpu = active_gpu();
+			match gpu {
+				Ok(gpu) => {
+					let info = gpu.info();
+					let gpu_usage = round(info.used_vram() as f64 / (1024.0 * 1024.0)) as f32;
+					let gpu_total = round(info.total_vram() as f64 / (1024.0 * 1024.0)) as f32;
+					Some(GpuInfo {
+						model: gpu.model().to_string(),
+						memory_used: gpu_usage,
+						memory_total: gpu_total,
+						memory_free: gpu_total - gpu_usage,
+						usage: info.load_pct() as u8,
+					})
+				}
+				Err(_) => None,
 			}
-			Err(_) => None,
 		}
 	}
 }

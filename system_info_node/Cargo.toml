@@ -23,7 +23,6 @@ napi-derive = "3.3.0"
 
 system_info = { path = "../system_info_core", features = ["full"], package = "puniyu_system_info"}
 
-
 [build-dependencies]
 napi-build = "=2.3.1"
 
