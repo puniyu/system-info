@@ -1,5 +1,12 @@
 # 变更日志
 
+## [1.2.4](https://github.com/puniyu/system-info/compare/node-v1.2.3...node-v1.2.4) (2025-11-14)
+
+
+### 🐛 错误修复
+
+* **system_info_core:** 限制GPU信息获取仅支持Windows系统 ([ceeb138](https://github.com/puniyu/system-info/commit/ceeb138a253b74ae28da56bdf0bb4fc651266d7e))
+
 ## [1.2.3](https://github.com/puniyu/system-info/compare/node-v1.2.2...node-v1.2.3) (2025-11-14)
 
 
