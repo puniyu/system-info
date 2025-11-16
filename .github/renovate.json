@@ -4,11 +4,10 @@
   "skipArtifactsUpdate": true,
   "packageRules": [
     {
-      "groupName": "puniyu system_info packages",
-      "matchManagers": ["cargo"],
-      "rangeStrategy": "auto",
-      "schedule": ["at any time"],
-      "labels": ["dependencies"]
+      "groupName": "sysinfo",
+      "matchDatasources": ["crate"],
+      "matchPackageNames": ["sysinfo"],
+      "rangeStrategy": "auto"
     }
   ]
 }
