@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/puniyu/system-info/compare/core-v1.3.0...core-v1.4.0) (2025-12-01)
+
+
+### ✨ 新功能
+
+* **system_info_core:** 重构系统信息获取模块 ([cb16e7a](https://github.com/puniyu/system-info/commit/cb16e7a7a7dec27b824c4d605388dc40ec55379d))
+
 ## [1.3.0](https://github.com/puniyu/system-info/compare/core-v0.8.3...core-v1.3.0) (2025-12-01)
 
 
