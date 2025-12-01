@@ -406,8 +406,8 @@ impl SystemInfo {
 				return NetworkInfo {
 					name: network_name.to_string(),
 					mac_addr: data.mac_address(),
-					upload: round(data.received() as f64 / 1024.0),
-					download: round(data.transmitted() as f64 / 1024.0),
+					upload: round(data.transmitted() as f64 / 1024.0),
+					download: round(data.received() as f64 / 1024.0),
 					ip_info: ip_info_list,
 				};
 			}
