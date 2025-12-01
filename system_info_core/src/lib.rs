@@ -38,10 +38,14 @@ pub struct NetworkInfo {
 	pub name: String,
 	/// 网卡ip信息
 	pub ip_info: Vec<IpInfo>,
-	/// 网卡接收字节数(单位: KB/S)
+	/// 上传速度(单位: KB/S)
 	pub upload: f64,
-	/// 网卡发送字节数(单位: KB/S)
+	/// 下载速度(单位: KB/S)
 	pub download: f64,
+	/// 总上传流量(单位: MB)
+	pub total_upload: f64,
+	/// 总下载流量(单位: MB)
+	pub total_download: f64,
 	/// 网卡mac地址
 	pub mac_addr: MacAddr,
 }
@@ -62,6 +66,8 @@ pub struct ProcessInfo {
 	pub pid: Pid,
 	/// 进程名称
 	pub name: String,
+	/// 子进程信息
+	pub sub_list: Option<Vec<ProcessInfo>>,
 	/// 进程启动时间
 	pub start_time: u64,
 	/// 进程运行时间，单位：秒
@@ -73,6 +79,7 @@ pub struct ProcessInfo {
 	/// 进程已用内存(单位: MB)
 	pub used_memory: f64,
 }
+
 #[derive(Debug, Clone)]
 #[cfg(feature = "cpu")]
 pub struct CpuInfo {
@@ -351,8 +358,10 @@ impl SystemInfo {
 			network_infos.push(NetworkInfo {
 				name: network.to_string(),
 				mac_addr: data.mac_address(),
-				upload: round((data.total_received() as f32 / 1024.0) as f64),
-				download: round((data.total_transmitted() as f32 / 1024.0) as f64),
+				upload: 0.0,
+				download: 0.0,
+				total_upload: round(data.total_transmitted() as f64 / 1024.0 / 1024.0),
+				total_download: round(data.total_received() as f64 / 1024.0 / 1024.0),
 				ip_info: ip_info_list,
 			});
 		}
@@ -406,8 +415,10 @@ impl SystemInfo {
 				return NetworkInfo {
 					name: network_name.to_string(),
 					mac_addr: data.mac_address(),
-					upload: round(data.transmitted() as f64 / 1024.0),
-					download: round(data.received() as f64 / 1024.0),
+					upload: round(data.transmitted() as f64 / 1024.0 / 0.1),
+					download: round(data.received() as f64 / 1024.0 / 0.1),
+					total_upload: round(data.total_transmitted() as f64 / 1024.0 / 1024.0),
+					total_download: round(data.total_received() as f64 / 1024.0 / 1024.0),
 					ip_info: ip_info_list,
 				};
 			}
@@ -422,6 +433,8 @@ impl SystemInfo {
 					mac_addr: data.mac_address(),
 					upload: 0.0,
 					download: 0.0,
+					total_upload: round(data.total_transmitted() as f64 / 1024.0 / 1024.0),
+					total_download: round(data.total_received() as f64 / 1024.0 / 1024.0),
 					ip_info: ip_info_list,
 				};
 			}
@@ -432,6 +445,8 @@ impl SystemInfo {
 			mac_addr: MacAddr([0, 0, 0, 0, 0, 0]),
 			upload: 0.0,
 			download: 0.0,
+			total_upload: 0.0,
+			total_download: 0.0,
 			ip_info: vec![],
 		}
 	}
@@ -447,20 +462,35 @@ impl SystemInfo {
 		Self::process_with_pid(process::id())
 	}
 
+	/// 获取指定 PID 的进程信息及其子进程
+	///
+	/// 此函数可以获取指定进程的详细信息，包括进程ID、进程名称、CPU使用率、内存使用率、已用内存，
+	/// 以及该进程的所有子进程信息
+	///
+	/// # 参数
+	///
+	/// * `pid` - 进程ID
+	///
+	/// # 返回值
+	///
+	/// * [ProcessInfo] - 进程信息，包含子进程列表
 	#[cfg(feature = "process")]
 	pub fn process_with_pid(pid: u32) -> ProcessInfo {
-		use std::time::{SystemTime, UNIX_EPOCH};
 		use sysinfo::{ProcessesToUpdate, System};
 		let mut system = System::new();
 		let pid = Pid::from_u32(pid);
-		system.refresh_processes(ProcessesToUpdate::Some(&[pid]), true);
+		system.refresh_processes(ProcessesToUpdate::All, true);
+		system.refresh_memory();
+
 		let process = system.process(pid);
+		let total_memory = system.total_memory();
 
 		let name = if let Some(process) = process {
 			process.name().to_string_lossy().into_owned()
 		} else {
 			"Unknown".to_string()
 		};
+
 		let start_time = process.map(|p| p.start_time()).unwrap_or(0);
 		let run_time = {
 			let current_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
@@ -471,7 +501,6 @@ impl SystemInfo {
 		let cpu_usage = process.map(|p| round(p.cpu_usage() as f64) as f32);
 
 		let memory_usage = process.and_then(|p| {
-			let total_memory = system.total_memory();
 			if total_memory > 0 {
 				Some(round(p.memory() as f64 / (total_memory as f64) * 100.0) as f32)
 			} else {
@@ -484,19 +513,39 @@ impl SystemInfo {
 			None => 0.0,
 		};
 
-		ProcessInfo { pid, name, start_time, run_time, cpu_usage, memory_usage, used_memory }
+		let sub_list = build_process_tree(&system, pid, total_memory);
+
+		ProcessInfo {
+			pid,
+			name,
+			sub_list,
+			start_time,
+			run_time,
+			cpu_usage,
+			memory_usage,
+			used_memory,
+		}
 	}
 
 	#[cfg(feature = "process")]
 	pub fn process_all() -> Vec<ProcessInfo> {
+		use std::collections::HashSet;
 		use sysinfo::{ProcessesToUpdate, System};
 		let mut system = System::new();
 		system.refresh_processes(ProcessesToUpdate::All, true);
+		system.refresh_memory();
 		let total_memory = system.total_memory();
-		system
-			.processes()
-			.values()
-			.map(|process| {
+
+		let all_pids: HashSet<Pid> = system.processes().keys().copied().collect();
+
+		all_pids
+			.iter()
+			.filter_map(|&pid| {
+				let process = system.process(pid)?;
+				if process.parent().is_some_and(|parent_pid| all_pids.contains(&parent_pid)) {
+					return None;
+				}
+
 				let cpu_usage = {
 					let usage = process.cpu_usage();
 					if usage > 0.0 { Some(usage.round()) } else { None }
@@ -515,15 +564,18 @@ impl SystemInfo {
 					current_time.saturating_sub(process_start_time)
 				};
 
-				ProcessInfo {
-					pid: process.pid(),
+				let sub_list = build_process_tree(&system, pid, total_memory);
+
+				Some(ProcessInfo {
+					pid,
 					name: process.name().to_string_lossy().to_string(),
+					sub_list,
 					start_time: process.start_time(),
 					run_time,
 					cpu_usage,
 					memory_usage,
 					used_memory,
-				}
+				})
 			})
 			.collect()
 	}
@@ -569,4 +621,50 @@ impl SystemInfo {
 
 fn round(value: f64) -> f64 {
 	(value * 100.0).round() / 100.0
+}
+
+#[cfg(feature = "process")]
+fn build_process_tree(
+	system: &sysinfo::System,
+	parent_pid: Pid,
+	total_memory: u64,
+) -> Option<Vec<ProcessInfo>> {
+	use std::time::{SystemTime, UNIX_EPOCH};
+
+	let children: Vec<ProcessInfo> = system
+		.processes()
+		.values()
+		.filter(|p| p.parent() == Some(parent_pid))
+		.map(|child| {
+			let child_pid = child.pid();
+			let cpu_usage = {
+				let usage = child.cpu_usage();
+				if usage > 0.0 { Some(round(usage as f64) as f32) } else { None }
+			};
+			let memory_usage = if total_memory > 0 {
+				Some(round(child.memory() as f64 / total_memory as f64 * 100.0) as f32)
+			} else {
+				None
+			};
+			let run_time = {
+				let current_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+				current_time.saturating_sub(child.start_time())
+			};
+
+			let sub_list = build_process_tree(system, child_pid, total_memory);
+
+			ProcessInfo {
+				pid: child_pid,
+				name: child.name().to_string_lossy().to_string(),
+				sub_list,
+				start_time: child.start_time(),
+				run_time,
+				cpu_usage,
+				memory_usage,
+				used_memory: child.memory() as f64 / 1024.0 / 1024.0,
+			}
+		})
+		.collect();
+
+	if children.is_empty() { None } else { Some(children) }
 }

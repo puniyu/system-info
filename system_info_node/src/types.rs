@@ -41,10 +41,14 @@ pub struct NetworkInfo {
 	pub name: String,
 	/// 网卡ip信息
 	pub ip_info: Vec<IpInfo>,
-	/// 网卡接收字节数(单位: KB/S)
+	/// 上传速度(单位: KB/S)
 	pub upload: f64,
-	/// 网卡发送字节数(单位: KB/S)
+	/// 下载速度(单位: KB/S)
 	pub download: f64,
+	/// 总上传流量(单位: MB)
+	pub total_upload: f64,
+	/// 总下载流量(单位: MB)
+	pub total_download: f64,
 	/// 网卡mac地址
 	pub mac_addr: String,
 }
@@ -56,6 +60,8 @@ impl From<system_info::NetworkInfo> for NetworkInfo {
 			ip_info: network_info.ip_info.into_iter().map(|ip_info| ip_info.into()).collect(),
 			upload: network_info.upload,
 			download: network_info.download,
+			total_upload: network_info.total_upload,
+			total_download: network_info.total_download,
 			mac_addr: network_info.mac_addr.to_string(),
 		}
 	}
@@ -83,6 +89,8 @@ pub struct ProcessInfo {
 	pub pid: u32,
 	/// 进程名称
 	pub name: String,
+	/// 子进程列表
+	pub sub_list: Option<Vec<ProcessInfo>>,
 	/// 进程启动时间
 	pub start_time: u32,
 	/// 进程运行时间，单位：秒
@@ -100,6 +108,7 @@ impl From<system_info::ProcessInfo> for ProcessInfo {
 		Self {
 			pid: process_info.pid.as_u32(),
 			name: process_info.name,
+			sub_list: process_info.sub_list.map(|list| list.into_iter().map(|p| p.into()).collect()),
 			start_time: process_info.start_time as u32,
 			run_time: process_info.run_time as u32,
 			cpu_usage: process_info.cpu_usage.map(|d| d as f64),
