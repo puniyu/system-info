@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/puniyu/system-info/compare/core-v1.5.0...core-v1.5.1) (2025-12-01)
+
+
+### 🐛 错误修复
+
+* **gpu:** 添加GPU模块的条件编译支持 ([8504ac2](https://github.com/puniyu/system-info/commit/8504ac26c86f2cdcb398733e5432f8d8964f3ed3))
+
 ## [1.5.0](https://github.com/puniyu/system-info/compare/core-v1.4.0...core-v1.5.0) (2025-12-01)
 
 
