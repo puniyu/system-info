@@ -21,13 +21,10 @@ jobs:
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       - name: 设置 rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: puniyu/setup-rust@main
         with:
-          targets: ${{ matrix.platform.target }}
-
-      - name: 设置 rust 缓存
-        uses: swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
-        with:
+          target: ${{ matrix.platform.target }}
+          save-cache: true
           prefix-key: ${{ env.APP_NAME }}
 
       - name: 配置 pnpm
@@ -65,15 +62,10 @@ jobs:
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       - name: 设置 rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: 添加目标平台
-        run: |
-          rustup target add ${{ matrix.platform.target }}
-
-      - name: 设置 rust 缓存
-        uses: swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
+        uses: puniyu/setup-rust@main
         with:
+          target: ${{ matrix.platform.target }}
+          save-cache: true
           prefix-key: ${{ env.APP_NAME }}
 
       - name: 配置 pnpm
@@ -112,13 +104,10 @@ jobs:
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       - name: 设置 rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: puniyu/setup-rust@main
         with:
-          targets: ${{ matrix.platform.target }}
-
-      - name: 设置 rust 缓存
-        uses: swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
-        with:
+          target: ${{ matrix.platform.target }}
+          save-cache: true
           prefix-key: ${{ env.APP_NAME }}
 
       - name: 配置 pnpm
