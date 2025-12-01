@@ -115,11 +115,6 @@ jobs:
         with:
           version: 10.24.0
 
-      - name: 设置apt 包
-        uses: awalsh128/cache-apt-pkgs-action@acb598e5ddbc6f68a970c5da0688d2f3a9f04d05 # v1.6.0
-        with:
-          packages: libdrm-dev libdrm-amdgpu1
-
       - name: 构建
         run: |
           pnpm install

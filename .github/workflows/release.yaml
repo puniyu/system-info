@@ -54,11 +54,6 @@ jobs:
           save-cache: true
           prefix-key: "system-info"
 
-      - name: 设置apt 包
-        uses: awalsh128/cache-apt-pkgs-action@acb598e5ddbc6f68a970c5da0688d2f3a9f04d05 # v1.6.0
-        with:
-          packages: libdrm-dev libdrm-amdgpu1
-
       - name: 拉取依赖
         run: cargo fetch
 
