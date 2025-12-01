@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/puniyu/system-info/compare/core-v0.8.3...core-v1.3.0) (2025-12-01)
+
+
+### ✨ 新功能
+
+* **system_info:** 增强网络和进程信息功能 ([ea00cff](https://github.com/puniyu/system-info/commit/ea00cff2fce129f048d316f6a66aa1b284fdca8d))
+
+
+### 🐛 错误修复
+
+* **network:** 修正网络上传下载数据计算错误 ([9f9f7a8](https://github.com/puniyu/system-info/commit/9f9f7a8f306cdda416b5089897df24deb9b1f7d5))
+
 ## [0.8.3](https://github.com/puniyu/system-info/compare/core-v0.8.2...core-v0.8.3) (2025-11-14)
 
 
