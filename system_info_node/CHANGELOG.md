@@ -1,5 +1,17 @@
 # 变更日志
 
+## [1.3.0](https://github.com/puniyu/system-info/compare/node-v1.2.4...node-v1.3.0) (2025-12-01)
+
+
+### ✨ 新功能
+
+* **system_info:** 增强网络和进程信息功能 ([ea00cff](https://github.com/puniyu/system-info/commit/ea00cff2fce129f048d316f6a66aa1b284fdca8d))
+
+
+### 🔧 其他更新
+
+* **deps:** update pnpm to v10.24.0 ([05b3430](https://github.com/puniyu/system-info/commit/05b34300de03bef8fdb522597d4894344c1667a1))
+
 ## [1.2.4](https://github.com/puniyu/system-info/compare/node-v1.2.3...node-v1.2.4) (2025-11-14)
 
 
