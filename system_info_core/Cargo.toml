@@ -11,17 +11,33 @@ repository.workspace = true
 
 [dependencies]
 sysinfo = { version = "0.37.0" }
-gfxinfo = { version = "0.1.2", optional = true }
 chrono.workspace = true
 num_cpus = "1.17.0"
+serde = { version = "1", features = ["derive"] }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows = { version = "0.62", features = [
+    "Win32_Graphics_Dxgi",
+    "Win32_Graphics_Dxgi_Common",
+] }
+wmi = "0.18"
+nvml-wrapper = "0.11"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+nvml-wrapper = "0.11"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+io-kit-sys = "0.5"
+core-foundation = "0.10"
+mach2 = "0.6"
 
 [features]
-default = ["host", "process", "cpu", "memory","network", "disk"]
+default = ["host", "process", "cpu", "memory", "network", "disk"]
 host = []
 process = []
 cpu = []
 memory = []
 network = []
 disk = []
-gpu = ["dep:gfxinfo"]
+gpu = []
 full = ["default", "gpu"]

@@ -77,14 +77,22 @@ fn test_disk_info() {
 #[cfg(feature = "gpu")]
 #[test]
 fn test_gpu_info() {
-	let gpu_info = SystemInfo::gpu();
+	let gpu = SystemInfo::gpu();
 
-	if let Some(gpu) = gpu_info {
+	if gpu.model != "Unknown" {
 		assert!(!gpu.model.is_empty());
-		assert!(gpu.memory_total > 0.0);
-		assert!(gpu.memory_used >= 0.0);
-		assert!(gpu.memory_free >= 0.0);
-		assert!(gpu.usage <= 100);
+		if let Some(total) = gpu.memory_total {
+			assert!(total > 0.0);
+		}
+		if let Some(used) = gpu.memory_used {
+			assert!(used >= 0.0);
+		}
+		if let Some(free) = gpu.memory_free {
+			assert!(free >= 0.0);
+		}
+		if let Some(usage) = gpu.usage {
+			assert!(usage <= 100);
+		}
 	} else {
 		dbg!("未检测到GPU");
 	}

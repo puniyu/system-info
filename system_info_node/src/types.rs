@@ -248,24 +248,24 @@ impl From<system_info::DiskDetail> for DiskDetail {
 pub struct GpuInfo {
 	/// GPU型号
 	pub model: String,
-	///  GPU已用内存(单位: MB)
-	pub memory_used: f64,
 	/// GPU总内存(单位: MB)
-	pub memory_total: f64,
-	///  GPU可用内存(单位: MB)
-	pub memory_free: f64,
+	pub memory_total: Option<f64>,
+	/// GPU已用内存(单位: MB)
+	pub memory_used: Option<f64>,
+	/// GPU可用内存(单位: MB)
+	pub memory_free: Option<f64>,
 	/// GPU使用率
-	pub usage: u32,
+	pub usage: Option<u32>,
 }
 
 impl From<system_info::GpuInfo> for GpuInfo {
 	fn from(gpu_info: system_info::GpuInfo) -> Self {
 		Self {
 			model: gpu_info.model,
-			memory_used: gpu_info.memory_used as f64,
-			memory_total: gpu_info.memory_total as f64,
-			memory_free: gpu_info.memory_free as f64,
-			usage: gpu_info.usage as u32,
+			memory_total: gpu_info.memory_total.map(|v| v as f64),
+			memory_used: gpu_info.memory_used.map(|v| v as f64),
+			memory_free: gpu_info.memory_free.map(|v| v as f64),
+			usage: gpu_info.usage.map(|v| v as u32),
 		}
 	}
 }

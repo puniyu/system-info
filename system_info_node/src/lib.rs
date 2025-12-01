@@ -53,6 +53,6 @@ pub fn get_disk_info() -> types::DiskInfo {
 
 #[napi]
 /// 获取GPU信息
-pub fn get_gpu_info() -> Option<types::GpuInfo> {
-	SystemInfo::gpu().map(|gpu| gpu.into())
+pub fn get_gpu_info() -> types::GpuInfo {
+	SystemInfo::gpu().into()
 }
