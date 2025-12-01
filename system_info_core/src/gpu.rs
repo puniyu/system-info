@@ -1,3 +1,4 @@
+#[cfg(any(target_os = "windows", target_os = "linux"))]
 use crate::round;
 
 #[derive(Debug, Clone)]
