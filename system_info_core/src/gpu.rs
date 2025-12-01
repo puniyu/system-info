@@ -222,12 +222,12 @@ impl GpuInfo {
 	#[cfg(target_os = "macos")]
 	fn from_iokit() -> Option<Self> {
 		use core_foundation::base::{CFType, TCFType};
-		use core_foundation::dictionary::CFDictionary;
+		use core_foundation::dictionary::{CFDictionary, CFMutableDictionaryRef};
 		use core_foundation::number::CFNumber;
 		use core_foundation::string::CFString;
 		use io_kit_sys::*;
 		use io_kit_sys::types::*;
-		use mach2::port::MACH_PORT_NULL;
+		use mach2::kern_return::KERN_SUCCESS;
 
 		unsafe {
 			let matching = IOServiceMatching(b"IOPCIDevice\0".as_ptr() as *const i8);
@@ -236,11 +236,7 @@ impl GpuInfo {
 			}
 
 			let mut iterator: io_iterator_t = 0;
-			let result = IOServiceGetMatchingServices(
-				kIOMasterPortDefault,
-				matching,
-				&mut iterator,
-			);
+			let result = IOServiceGetMatchingServices(kIOMasterPortDefault, matching, &mut iterator);
 
 			if result != KERN_SUCCESS as i32 {
 				return None;
@@ -256,25 +252,21 @@ impl GpuInfo {
 				}
 
 				let mut properties: CFMutableDictionaryRef = std::ptr::null_mut();
-				let result = IORegistryEntryCreateCFProperties(
-					service,
-					&mut properties,
-					std::ptr::null(),
-					0,
-				);
+				let result =
+					IORegistryEntryCreateCFProperties(service, &mut properties, std::ptr::null(), 0);
 
 				if result == KERN_SUCCESS as i32 && !properties.is_null() {
-					let dict = CFDictionary::<CFString, CFType>::wrap_under_get_rule(
-						properties as _,
-					);
+					let dict =
+						CFDictionary::<CFString, CFType>::wrap_under_get_rule(properties as _);
 
 					if let Some(class_code) = dict.find(CFString::new("class-code")) {
-						let class_code_ref: &CFType = class_code;
-						if let Some(num) = class_code_ref.downcast_ref::<CFNumber>() {
+						if let Some(num) = class_code.downcast::<CFNumber>() {
 							let code: i32 = num.to_i32().unwrap_or(0);
 							if (code & 0xFF0000) == 0x030000 {
 								if let Some(model) = dict.find(CFString::new("model")) {
-									if let Some(data) = model.downcast_ref::<core_foundation::data::CFData>() {
+									if let Some(data) =
+										model.downcast::<core_foundation::data::CFData>()
+									{
 										let bytes = data.bytes();
 										if let Ok(s) = std::str::from_utf8(bytes) {
 											gpu_model = s.trim_end_matches('\0').to_string();
@@ -283,7 +275,7 @@ impl GpuInfo {
 								}
 
 								if let Some(vram_size) = dict.find(CFString::new("VRAM,totalMB")) {
-									if let Some(num) = vram_size.downcast_ref::<CFNumber>() {
+									if let Some(num) = vram_size.downcast::<CFNumber>() {
 										vram = num.to_i64().unwrap_or(0) as f32;
 									}
 								}
