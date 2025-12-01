@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/puniyu/system-info/compare/core-v1.4.0...core-v1.5.0) (2025-12-01)
+
+
+### ✨ 新功能
+
+* **gpu:** 改进 macOS GPU 信息获取逻辑 ([1c27ba7](https://github.com/puniyu/system-info/commit/1c27ba783501bf1bf5586b6b4327003ef7b501c2))
+
 ## [1.4.0](https://github.com/puniyu/system-info/compare/core-v1.3.0...core-v1.4.0) (2025-12-01)
 
 
