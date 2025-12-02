@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.3](https://github.com/puniyu/system-info/compare/core-v1.5.2...core-v1.5.3) (2025-12-02)
+
+
+### 🐛 错误修复
+
+* **network:** 修复未能获取全部网卡速率信息 ([3fd274e](https://github.com/puniyu/system-info/commit/3fd274e0ab2be7d5ce97b5c7fb92d1554ef68123))
+
 ## [1.5.2](https://github.com/puniyu/system-info/compare/core-v1.5.1...core-v1.5.2) (2025-12-02)
 
 
