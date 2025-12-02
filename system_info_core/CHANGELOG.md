@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.2](https://github.com/puniyu/system-info/compare/core-v1.5.1...core-v1.5.2) (2025-12-02)
+
+
+### ♻️ 代码重构
+
+* **gpu:** 重构GPU信息获取逻辑以提高跨平台兼容性 ([fd5a954](https://github.com/puniyu/system-info/commit/fd5a954215a49caa2e2ffa9c32f245f0cf80c975))
+
 ## [1.5.1](https://github.com/puniyu/system-info/compare/core-v1.5.0...core-v1.5.1) (2025-12-01)
 
 
