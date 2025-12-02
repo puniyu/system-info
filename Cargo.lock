@@ -524,7 +524,7 @@ dependencies = [
 
 [[package]]
 name = "puniyu_system_info"
-version = "1.5.1"
+version = "1.5.2"
 dependencies = [
  "chrono",
  "core-foundation",
@@ -646,7 +646,7 @@ dependencies = [
 
 [[package]]
 name = "system_info_node"
-version = "1.5.1"
+version = "1.5.2"
 dependencies = [
  "chrono",
  "napi",

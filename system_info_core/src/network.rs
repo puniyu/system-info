@@ -54,10 +54,19 @@ impl NetworkInfo {
 	}
 
 	pub fn all() -> Vec<Self> {
-		Networks::new_with_refreshed_list()
+		use std::thread::sleep;
+		use std::time::Duration;
+		let mut networks = Networks::new_with_refreshed_list();
+		sleep(Duration::from_millis(100));
+		networks.refresh(true);
+		networks
 			.list()
 			.iter()
-			.map(|(name, data)| Self::from_data(name, data, 0.0, 0.0))
+			.map(|(name, data)| {
+				let upload = round(data.transmitted() as f64 / 1024.0 / 0.1);
+				let download = round(data.received() as f64 / 1024.0 / 0.1);
+				Self::from_data(name, data, upload, download)
+			})
 			.collect()
 	}
 
