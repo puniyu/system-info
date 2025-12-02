@@ -15,8 +15,8 @@ pub struct GpuInfo {
 	pub usage: Option<u8>,
 }
 
-impl Default for GpuInfo {
-	fn default() -> Self {
+impl GpuInfo {
+	pub fn new() -> Option<Self> {
 		#[cfg(target_os = "windows")]
 		{
 			Self::from_windows()
@@ -29,40 +29,20 @@ impl Default for GpuInfo {
 
 		#[cfg(target_os = "macos")]
 		{
-			Self::from_macos()
+			Self::from_iokit()
 		}
 
 		#[cfg(not(any(target_os = "windows", target_os = "linux", target_os = "macos")))]
 		{
-			Self::unknown()
-		}
-	}
-}
-
-impl GpuInfo {
-	pub fn new() -> Self {
-		Self::default()
-	}
-
-	fn unknown() -> Self {
-		Self {
-			model: "Unknown".to_string(),
-			memory_total: None,
-			memory_used: None,
-			memory_free: None,
-			usage: None,
+			None
 		}
 	}
 
 	#[cfg(target_os = "windows")]
-	fn from_windows() -> Self {
-		if let Some(info) = Self::from_nvml() {
-			return info;
-		}
-		if let Some(info) = Self::from_wmi() {
-			return info;
-		}
-		Self::from_dxgi().unwrap_or_else(Self::unknown)
+	fn from_windows() -> Option<Self> {
+		Self::from_nvml()
+			.or_else(Self::from_wmi)
+			.or_else(Self::from_dxgi)
 	}
 
 	#[cfg(target_os = "windows")]
@@ -166,11 +146,8 @@ impl GpuInfo {
 	}
 
 	#[cfg(target_os = "linux")]
-	fn from_linux() -> Self {
-		if let Some(info) = Self::from_nvml() {
-			return info;
-		}
-		Self::from_lspci().unwrap_or_else(Self::unknown)
+	fn from_linux() -> Option<Self> {
+		Self::from_nvml().or_else(Self::from_lspci)
 	}
 
 	#[cfg(target_os = "linux")]
@@ -213,11 +190,6 @@ impl GpuInfo {
 			}
 		}
 		None
-	}
-
-	#[cfg(target_os = "macos")]
-	fn from_macos() -> Self {
-		Self::from_iokit().unwrap_or_else(Self::unknown)
 	}
 
 	#[cfg(target_os = "macos")]

@@ -77,9 +77,7 @@ fn test_disk_info() {
 #[cfg(feature = "gpu")]
 #[test]
 fn test_gpu_info() {
-	let gpu = SystemInfo::gpu();
-
-	if gpu.model != "Unknown" {
+	if let Some(gpu) = SystemInfo::gpu() {
 		assert!(!gpu.model.is_empty());
 		if let Some(total) = gpu.memory_total {
 			assert!(total > 0.0);

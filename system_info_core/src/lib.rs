@@ -14,10 +14,10 @@ mod memory;
 
 pub use memory::MemoryInfo;
 
-#[cfg(feature = "host")]
+#[cfg(feature = "disk")]
 mod disk;
 
-#[cfg(feature = "host")]
+#[cfg(feature = "disk")]
 pub use disk::{DiskDetail, DiskInfo};
 
 #[cfg(feature = "network")]
@@ -149,13 +149,12 @@ impl SystemInfo {
 	///
 	/// 此函数可以获取GPU信息，包括型号、已用内存、总内存、可用内存、使用率等
 	///
-	/// 暂时只支持 Windows
 	/// # 返回值
 	///
-	/// * [GpuInfo] - GPU信息
+	/// * `Option<GpuInfo>` - GPU信息，如果无法检测到GPU则返回None
 	///
 	#[cfg(feature = "gpu")]
-	pub fn gpu() -> GpuInfo {
+	pub fn gpu() -> Option<GpuInfo> {
 		GpuInfo::new()
 	}
 }
