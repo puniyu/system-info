@@ -1,5 +1,12 @@
 # 变更日志
 
+## [1.5.3](https://github.com/puniyu/system-info/compare/node-v1.5.2...node-v1.5.3) (2025-12-02)
+
+
+### 🔧 其他更新
+
+* **node:** Synchronize syatem-info versions
+
 ## [1.5.2](https://github.com/puniyu/system-info/compare/node-v1.5.1...node-v1.5.2) (2025-12-02)
 
 
