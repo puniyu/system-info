@@ -14,7 +14,9 @@ pub struct HostInfo {
 	pub os_type: String,
 	/// 系统架构
 	pub arch: String,
-	/// 系统启动时间
+	/// 时区
+	pub time_zone: String,
+	/// 系统启动时间(UTC时间)
 	pub boot_time: DateTime<Utc>,
 	/// 系统运行时间， 单位：秒
 	pub uptime: u32,
@@ -28,6 +30,7 @@ impl From<system_info::HostInfo> for HostInfo {
 			os_version: host_info.os_version,
 			os_type: host_info.os_type,
 			arch: host_info.arch,
+			time_zone: host_info.time_zone,
 			boot_time: host_info.boot_time,
 			uptime: host_info.uptime as u32,
 		}
