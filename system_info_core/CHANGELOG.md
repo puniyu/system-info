@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.4](https://github.com/puniyu/system-info/compare/core-v1.5.3...core-v1.5.4) (2025-12-21)
+
+
+### 🔧 其他更新
+
+* **system-info:** 添加时区信息并更新系统启动时间说明 ([ab88a10](https://github.com/puniyu/system-info/commit/ab88a10d139fa479782ed0a188a587635d3a2dd8))
+
 ## [1.5.3](https://github.com/puniyu/system-info/compare/core-v1.5.2...core-v1.5.3) (2025-12-02)
 
 

@@ -1,5 +1,13 @@
 # 变更日志
 
+## [1.5.4](https://github.com/puniyu/system-info/compare/node-v1.5.3...node-v1.5.4) (2025-12-21)
+
+
+### 🔧 其他更新
+
+* **deps:** update node packages ([#60](https://github.com/puniyu/system-info/issues/60)) ([2c16fdb](https://github.com/puniyu/system-info/commit/2c16fdb82ff10be66df5c8d1241707f8ae8f267b))
+* **system-info:** 添加时区信息并更新系统启动时间说明 ([ab88a10](https://github.com/puniyu/system-info/commit/ab88a10d139fa479782ed0a188a587635d3a2dd8))
+
 ## [1.5.3](https://github.com/puniyu/system-info/compare/node-v1.5.2...node-v1.5.3) (2025-12-02)
 
 
