@@ -12,12 +12,13 @@ pub struct HostInfo {
 	pub os_type: String,
 	/// 系统架构
 	pub arch: String,
-	/// 系统启动时间
+	/// 时区
+	pub time_zone: String,
+	/// 系统启动时间(UTC时间)
 	pub boot_time: DateTime<Utc>,
 	/// 系统运行时间， 单位：秒
 	pub uptime: u64,
 }
-
 
 impl Default for HostInfo {
 	fn default() -> Self {
@@ -33,11 +34,20 @@ impl Default for HostInfo {
 			.timestamp_opt(boot_time_secs as i64, 0)
 			.single()
 			.expect("Invalid boot time timestamp");
+		let tz_str = iana_time_zone::get_timezone().expect("Invalid timezone");
 		let uptime = System::uptime();
-		Self { host_name: hostname, os_name, arch, os_version, os_type, boot_time, uptime }
+		Self {
+			host_name: hostname,
+			os_name,
+			arch,
+			os_version,
+			os_type,
+			boot_time,
+			uptime,
+			time_zone: tz_str,
+		}
 	}
 }
-
 
 impl HostInfo {
 	pub fn new() -> Self {
