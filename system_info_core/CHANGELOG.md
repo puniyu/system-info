@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.5](https://github.com/puniyu/system-info/compare/core-v1.5.4...core-v1.5.5) (2026-01-24)
+
+
+### 🔧 其他更新
+
+* **deps:** 修正依赖项 ([0381f7e](https://github.com/puniyu/system-info/commit/0381f7e06526a7bd40188857dcfd1f54302b0dce))
+
 ## [1.5.4](https://github.com/puniyu/system-info/compare/core-v1.5.3...core-v1.5.4) (2025-12-21)
 
 
