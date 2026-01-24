@@ -12,18 +12,17 @@ pub struct CpuInfo {
 	pub usage: Option<f32>,
 }
 
-
 impl Default for CpuInfo {
 	fn default() -> Self {
 		use std::thread::sleep;
 		use sysinfo::System;
 		let mut system = System::new();
 		system.refresh_cpu_all();
-		
+
 		sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
 		system.refresh_cpu_usage();
 		let cpu = &system.cpus()[0];
-		
+
 		Self {
 			model_name: cpu.brand().to_string(),
 			physical_cores: num_cpus::get_physical() as u32,
@@ -33,7 +32,6 @@ impl Default for CpuInfo {
 		}
 	}
 }
-
 
 impl CpuInfo {
 	pub fn new() -> Self {
