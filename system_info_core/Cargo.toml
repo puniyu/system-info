@@ -22,10 +22,10 @@ windows = { version = "0.62", features = [
     "Win32_Graphics_Dxgi_Common",
 ] }
 wmi = "0.18"
-nvml-wrapper = "0.11"
+nvml-wrapper = "0.12"
 
 [target.'cfg(target_os = "linux")'.dependencies]
-nvml-wrapper = "0.11"
+nvml-wrapper = "0.12"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 io-kit-sys = "0.5"
