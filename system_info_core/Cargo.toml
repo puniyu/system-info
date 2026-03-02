@@ -10,7 +10,7 @@ homepage.workspace = true
 repository.workspace = true
 
 [dependencies]
-sysinfo = { version = "0.37.0" }
+sysinfo = { version = "0.38.0" }
 chrono.workspace = true
 num_cpus = "1.17.0"
 serde = { version = "1", features = ["derive"] }
