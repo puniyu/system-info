@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.6](https://github.com/puniyu/system-info/compare/core-v1.5.5...core-v1.5.6) (2026-04-18)
+
+
+### 🔧 其他更新
+
+* **deps:** update rust crate sysinfo to 0.38.0 ([c6a788c](https://github.com/puniyu/system-info/commit/c6a788cdbb4b4de501e0be455f0ad2c2ceab66af))
+* **deps:** update rust crates ([32a038b](https://github.com/puniyu/system-info/commit/32a038bf524d1fa21b3707f137963610e935d6bb))
+
 ## [1.5.5](https://github.com/puniyu/system-info/compare/core-v1.5.4...core-v1.5.5) (2026-01-24)
 
 
