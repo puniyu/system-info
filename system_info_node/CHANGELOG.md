@@ -1,5 +1,17 @@
 # 变更日志
 
+## [1.5.7](https://github.com/puniyu/system-info/compare/node-v1.5.6...node-v1.5.7) (2026-06-09)
+
+
+### 🐛 错误修复
+
+* 增加cpu温度获取，完善README.md ([#147](https://github.com/puniyu/system-info/issues/147)) ([eaf5812](https://github.com/puniyu/system-info/commit/eaf58128e209fb91cd6221913147ff54e3e5835e))
+
+
+### 🔧 其他更新
+
+* **deps:** update rust crates ([3f2e777](https://github.com/puniyu/system-info/commit/3f2e7776ee40089bf83c76e648afb57aa7a7f5ea))
+
 ## [1.5.6](https://github.com/puniyu/system-info/compare/node-v1.5.5...node-v1.5.6) (2026-05-09)
 
 
