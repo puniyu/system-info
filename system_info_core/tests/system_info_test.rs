@@ -26,6 +26,11 @@ fn test_cpu_info() {
 	if let Some(usage) = cpu_info.usage {
 		assert!(usage <= 100.0);
 	}
+
+	if let Some(temperature) = cpu_info.temperature {
+		assert!(temperature > 0.0);
+		assert!(temperature < 150.0);
+	}
 }
 
 #[cfg(feature = "process")]

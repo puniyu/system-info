@@ -56,3 +56,18 @@ pub fn get_disk_info() -> types::DiskInfo {
 pub fn get_gpu_info() -> Option<types::GpuInfo> {
 	SystemInfo::gpu().map(|g| g.into())
 }
+
+#[napi]
+/// 获取全部系统信息（主机、CPU、内存、磁盘、网络、当前进程、GPU）
+pub fn get_all_system_info() -> types::AllSystemInfo {
+	types::AllSystemInfo {
+		host: SystemInfo::host().into(),
+		cpu: SystemInfo::cpu().into(),
+		memory: SystemInfo::memory().into(),
+		disk: SystemInfo::disk().into(),
+		networks: SystemInfo::network().into_iter().map(|info| info.into()).collect(),
+		current_network: SystemInfo::current_network().into(),
+		current_process: SystemInfo::process().into(),
+		gpu: SystemInfo::gpu().map(|g| g.into()),
+	}
+}
