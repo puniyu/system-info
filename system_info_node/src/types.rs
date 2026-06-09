@@ -134,6 +134,8 @@ pub struct CpuInfo {
 	pub frequency: f64,
 	/// CPU使用率
 	pub usage: Option<f64>,
+	/// CPU温度(单位: °C)
+	pub temperature: Option<f64>,
 }
 
 impl From<system_info::CpuInfo> for CpuInfo {
@@ -144,6 +146,7 @@ impl From<system_info::CpuInfo> for CpuInfo {
 			logical_cores: cpu_info.logical_cores,
 			frequency: cpu_info.frequency as f64,
 			usage: cpu_info.usage.map(|d| d as f64),
+			temperature: cpu_info.temperature.map(|d| d as f64),
 		}
 	}
 }
@@ -271,4 +274,25 @@ impl From<system_info::GpuInfo> for GpuInfo {
 			usage: gpu_info.usage.map(|v| v as u32),
 		}
 	}
+}
+
+#[derive(Debug, Clone)]
+#[napi(object, use_nullable = true)]
+pub struct AllSystemInfo {
+	/// 主机信息
+	pub host: HostInfo,
+	/// CPU信息
+	pub cpu: CpuInfo,
+	/// 内存信息
+	pub memory: MemoryInfo,
+	/// 磁盘信息
+	pub disk: DiskInfo,
+	/// 所有网卡信息
+	pub networks: Vec<NetworkInfo>,
+	/// 当前活跃网卡
+	pub current_network: NetworkInfo,
+	/// 当前进程信息
+	pub current_process: ProcessInfo,
+	/// GPU信息，无法检测时为 null
+	pub gpu: Option<GpuInfo>,
 }
