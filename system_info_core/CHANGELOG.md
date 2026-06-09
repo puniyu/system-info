@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.7](https://github.com/puniyu/system-info/compare/core-v1.5.6...core-v1.5.7) (2026-06-09)
+
+
+### 🐛 错误修复
+
+* 增加cpu温度获取，完善README.md ([#147](https://github.com/puniyu/system-info/issues/147)) ([eaf5812](https://github.com/puniyu/system-info/commit/eaf58128e209fb91cd6221913147ff54e3e5835e))
+
 ## [1.5.6](https://github.com/puniyu/system-info/compare/core-v1.5.5...core-v1.5.6) (2026-05-09)
 
 
